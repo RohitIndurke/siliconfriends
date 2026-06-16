@@ -29,6 +29,14 @@ export type Job = {
   organisationSize: string;
   contactPerson: string;
 };
+export const generateJobSlug = (company: string, title: string) => {
+  const combined = `${company}-${title}`;
+  return combined
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+};
+
 
 export const JOBS: Job[] = [
   {

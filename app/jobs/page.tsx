@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { JOBS, POPULAR_TAGS } from "./data";
+import { JOBS, POPULAR_TAGS, generateJobSlug } from "./data";
 import { Button } from "@heroui/react";
+import { JobCreationForm } from "../components/JobCreationForm";
 
 const TABS = ["Opportunities", "Applications", "Offers"] as const;
 type Tab = (typeof TABS)[number];
@@ -13,40 +14,32 @@ export default function JobsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Opportunities");
   const [showEligible, setShowEligible] = useState(true);
   const [showNonEligible, setShowNonEligible] = useState(false);
+  const [isJobFormOpen, setIsJobFormOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] font-sans">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-2 border-b border-gray-200 shadow-sm">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            alt="MIT Arts Commerce & Science College"
-            width={180}
-            height={48}
-            className="h-10 w-auto object-contain"
-            priority
-          />
-        </div>
-        <div className="flex items-center gap-5">
-          <button className="text-gray-500 hover:text-gray-800 transition-colors" aria-label="Gallery">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="1.5" /><circle cx="8.5" cy="8.5" r="1.5" strokeWidth="1.5" /><path d="M21 15l-5-5L5 21" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors" aria-label="Calendar">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="1.5" /><path d="M16 2v4M8 2v4M3 10h18" strokeWidth="1.5" strokeLinecap="round" /></svg>
-          </button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors relative" aria-label="Messages">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors relative" aria-label="Notifications">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <div className="flex items-center gap-2 ml-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold border-2 border-purple-200">
-              RI
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="mx-auto max-w-[1100px] px-6 py-2 flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="MIT Arts Commerce & Science College"
+              width={180}
+              height={48}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </div>
+          <div className="flex items-center gap-5">
+
+            <div className="flex items-center gap-2 ml-2 cursor-pointer">
+              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold border-2 border-purple-200">
+                RI
+              </div>
+              <span className="text-sm font-medium text-gray-700 max-w-[100px] truncate">Rohit Dashr...</span>
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
-            <span className="text-sm font-medium text-gray-700 max-w-[100px] truncate">Rohit Dashr...</span>
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </div>
         </div>
       </header>
@@ -68,11 +61,10 @@ export default function JobsPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 text-sm font-medium transition-colors relative ${
-                  activeTab === tab
+                className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === tab
                     ? "text-purple-700 border-b-2 border-purple-700"
                     : "text-gray-500 hover:text-gray-800"
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -110,7 +102,7 @@ export default function JobsPage() {
               {JOBS.map((job) => (
                 <Link
                   key={job.id}
-                  href={`/jobs/${job.id}`}
+                  href={`/jobs/${generateJobSlug(job.company, job.title)}`}
                   className="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer"
                 >
                   {/* Card Header */}
@@ -182,7 +174,10 @@ export default function JobsPage() {
 
           {/* Right Sidebar */}
           <aside className="w-[280px] shrink-0 hidden lg:flex flex-col gap-5">
-            <Button className="w-full font-semibold bg-purple-700 text-white shadow-md py-3 rounded-xl hover:bg-purple-800 transition-colors">
+            <Button 
+              onPress={() => setIsJobFormOpen(true)}
+              className="w-full font-semibold bg-purple-700 text-white shadow-md py-3 rounded-xl hover:bg-purple-800 transition-colors"
+            >
               Create Job
             </Button>
 
@@ -219,6 +214,17 @@ export default function JobsPage() {
           </aside>
         </div>
       </main>
+
+      {/* Create Job Modal Overlay */}
+      {isJobFormOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/50 overflow-y-auto backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+            <div className="relative w-full max-w-3xl">
+              <JobCreationForm onClose={() => setIsJobFormOpen(false)} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
