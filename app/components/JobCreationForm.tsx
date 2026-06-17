@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import { createJobAction } from "@/actions/job";
+import { useRouter } from "next/navigation";
 
 interface JobFormState {
     jobTitle: string;
@@ -41,43 +43,43 @@ interface JobFormState {
 }
 
 const INITIAL_STATE: JobFormState = {
-    jobTitle: "Business Development Trainee (BDT)",
+    jobTitle: "",
     employmentType: "Internship",
     positionType: "Non-Technical",
-    location: "Hyderabad",
-    duration: "3 Months",
-    jobFunction: "Non Technical",
+    location: "",
+    duration: "2 Months",
+    jobFunction: "",
 
-    companyName: "SEOAK Innovations Pvt. Ltd.",
-    companyLogo: "SI",
-    industry: "EdTech / IT Training",
-    foundedYear: 2023,
-    website: "https://www.seoak.in",
-    contactPerson: "Nishant V. Kasare",
-    organizationSize: "51 - 200",
-    baseLocation: "Warangal, Telangana",
+    companyName: "",
+    companyLogo: "",
+    industry: "",
+    foundedYear: "",
+    website: "",
+    contactPerson: "",
+    organizationSize: "",
+    baseLocation: "",
 
-    stipendMonthly: 15000,
-    maxIncentivesMonthly: 10000,
+    stipendMonthly: "",
+    maxIncentivesMonthly: "",
     eligibleForFte: true,
-    ctcFixedLpa: 6.0,
-    ctcVariableLpa: 2.0,
+    ctcFixedLpa: "",
+    ctcVariableLpa: "",
 
-    requiredSkills: "Business Development, Communications",
-    goodToHaveSkills: "Business Acumen, Communication Skills",
+    requiredSkills: "",
+    goodToHaveSkills: "",
 
-    description: "Business development and client engagement. Excellent Communication Skill is required.",
-    otherDetails: "Business Development Trainee (BDT) / Business Development Associate (BDA)",
+    description: "",
+    otherDetails: "",
 
-    eligibilitySummary: "All Interested U.G AND P.G.",
-    eligibleCourses: ["B.Sc. - Cyber & Digital Science", "B.Sc. - Computer Science", "B.Com. - Commerce"],
-    selectionProcess: "Telephonic Round 1, Telephonic Round 2",
+    eligibilitySummary: "",
+    eligibleCourses: [],
+    selectionProcess: "",
 
     status: "Eligible / Open",
     onCampus: true,
-    opensAt: "2026-06-16T09:00",
-    closesAt: "2026-06-19T10:00",
-    externalApplyLink: "https://forms.gle/hSZj66CVGxmWB8uQ6",
+    opensAt: "",
+    closesAt: "",
+    externalApplyLink: "",
 };
 
 const ALL_COURSES = [
@@ -102,12 +104,14 @@ const ALL_COURSES = [
 
 export interface JobCreationFormProps {
     onClose?: () => void;
+    userId: string;
 }
 
-export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose }) => {
+export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, userId }) => {
     const [formData, setFormData] = useState<JobFormState>(INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [showToast, setShowToast] = useState(false);
+    const router = useRouter();
 
     const toggleCourse = (course: string) => {
         setFormData((prev) => {
@@ -139,12 +143,23 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose }) => 
         setIsSubmitting(true);
         try {
             console.log("Submitting Full Job Payload:", formData);
-            await new Promise((resolve) => setTimeout(resolve, 800));
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 3500);
-            if (onClose) onClose();
+            
+            const result = await createJobAction(formData, userId);
+            
+            if (result.success) {
+                setShowToast(true);
+                router.refresh(); // Refresh the page to fetch the new data
+                
+                setTimeout(() => {
+                    setShowToast(false);
+                    if (onClose) onClose();
+                }, 1500);
+            } else {
+                alert("Failed to create job: " + result.error);
+            }
         } catch (error) {
             console.error(error);
+            alert("An unexpected error occurred");
         } finally {
             setIsSubmitting(false);
         }
@@ -217,7 +232,12 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose }) => 
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-gray-600">Duration</label>
-                            <input type="text" name="duration" value={formData.duration} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-500 transition" placeholder="e.g. 3 Months" />
+                            <select name="duration" value={formData.duration} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                                <option value="2 Months">2 Months</option>
+                                <option value="3 Months">3 Months</option>
+                                <option value="6 Months">6 Months</option>
+                                <option value="12 Months">12 Months</option>
+                            </select>
                         </div>
                         <div className="flex flex-col gap-1.5 md:col-span-2">
                             <label className="text-xs font-semibold text-gray-600">Job Function(s)</label>
