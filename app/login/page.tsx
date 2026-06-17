@@ -5,6 +5,7 @@ import { signIn } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,15 +42,19 @@ export default function LoginPage() {
         transition={{ duration: 0.4 }}
         className="w-full max-w-[380px] bg-white p-5 sm:p-8 rounded-2xl border border-gray-200 shadow-sm"
       >
-        <div className="flex flex-col items-center mb-6">
-          {/* Logo icon matching jobs theme */}
-          <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mb-5">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#7C3AED">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Image
+              src="/sf-logo.png"
+              alt="SiliconFriends Logo"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-cover rounded-xl shadow-sm"
+            />
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">SiliconFriends</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-            Sign in to SiliconFriends
+          <h1 className="text-[15px] font-medium text-gray-500">
+            Sign in to your account
           </h1>
         </div>
 
