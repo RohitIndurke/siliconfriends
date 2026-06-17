@@ -28,14 +28,13 @@ export default function JobDetailClient({ job }: { job: any }) {
         <div className="mx-auto max-w-[1100px] px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image
-              src="/sf-logo.png"
-              alt="SiliconFriends"
-              width={48}
+              src="/logo.png"
+              alt="MIT Arts Commerce & Science College"
+              width={180}
               height={48}
-              className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg sm:rounded-xl shadow-sm"
+              className="h-10 w-auto object-contain"
               priority
             />
-            <span className="hidden sm:block text-xl font-bold text-gray-900 tracking-tight">SiliconFriends</span>
           </div>
           <div className="flex items-center gap-5">
             {session ? (
