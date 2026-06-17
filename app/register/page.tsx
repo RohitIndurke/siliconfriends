@@ -5,6 +5,7 @@ import { signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,16 +45,20 @@ export default function RegisterPage() {
         transition={{ duration: 0.4 }}
         className="w-full max-w-[380px] bg-white p-5 sm:p-8 rounded-2xl border border-gray-200 shadow-sm"
       >
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mb-5">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#7C3AED">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Image
+              src="/sf-logo.png"
+              alt="SiliconFriends Logo"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-cover rounded-xl shadow-sm"
+            />
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">SiliconFriends</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-            Create Account
+          <h1 className="text-[15px] font-medium text-gray-500">
+            Create your account
           </h1>
-          <p className="text-[13px] text-gray-500 mt-1">Admin portal to register new users</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
