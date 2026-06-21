@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { job } from "@/db/schema";
-import { generateJobSlug } from "../data";
+import { generateJobSlug } from "../../../components/data";
 import JobDetailClient from "./JobDetailClient";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -20,6 +20,11 @@ export default async function JobDetailPage({
   }
 
   const { slug } = await params;
+
+  if ((session.user as any).role !== "admin") {
+    redirect(`/profile/jobs/${slug}`);
+  }
+
   const allJobs = await db.select().from(job);
   
   const foundJob = allJobs.find((j) => generateJobSlug(j.companyName, j.jobTitle) === slug);

@@ -1,29 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { POPULAR_TAGS, generateJobSlug } from "./data";
+import { POPULAR_TAGS, generateJobSlug } from "../components/data";
 import { Button } from "@heroui/react";
 import { JobCreationForm } from "../components/JobCreationForm";
 import { AddStudentForm } from "../components/AddStudentForm";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import DashboardTab from "./DashboardTab";
-import StudentsTab from "./StudentsTab";
+import DashboardTab from "../components/tabs/DashboardTab";
+import StudentsTab from "../components/tabs/StudentsTab";
+import AnalyticsTab from "../components/tabs/AnalyticsTab";
 
-const TABS = ["Dashboard", "Job Posting", "Applications", "Students"] as const;
-type Tab = (typeof TABS)[number];
+const ADMIN_TABS = ["Dashboard", "Job Posting", "Analytics", "Students"] as const;
 
-export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
-  const [activeTab, setActiveTab] = useState<Tab>("Dashboard");
+export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
+  const { data: session } = useSession();
+
+  const [activeTab, setActiveTab] = useState<string>("Dashboard");
   const [showEligible, setShowEligible] = useState(true);
   const [showNonEligible, setShowNonEligible] = useState(false);
   const [isJobFormOpen, setIsJobFormOpen] = useState(false);
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
-  
-  const { data: session } = useSession();
+
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -55,7 +56,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
             {session ? (
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold border-2 border-purple-200 uppercase shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
                     {session.user.name.substring(0, 2)}
                   </div>
                   <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[150px] truncate">
@@ -71,7 +72,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
               </div>
             ) : (
               <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-purple-700">
+                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
                   Login
                 </Link>
               </div>
@@ -85,38 +86,42 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
         {/* Page Title + Admin Buttons (mobile) */}
         <div className="flex items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7C3AED"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Jobs</h1>
           </div>
           {/* Admin buttons visible on mobile in header row */}
-          {(session?.user as any)?.role === "admin" && (
-            <div className="flex lg:hidden items-center gap-2">
-              <button
-                onClick={() => setIsJobFormOpen(true)}
-                className="text-xs font-semibold bg-purple-700 text-white shadow-sm px-3 py-1.5 rounded-lg hover:bg-purple-800 transition-colors"
-              >
-                + Create Job
-              </button>
-              <button
-                className="text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
-              >
-                ✨ AI JD
-              </button>
-            </div>
-          )}
+          <div className="flex lg:hidden items-center gap-2">
+            <button
+              className="flex items-center gap-1.5 text-sm font-semibold bg-[#0f9d58] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#0b8043] transition-colors"
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              AI JD Parser
+            </button>
+            <button
+              onClick={() => setIsJobFormOpen(true)}
+              className="flex items-center gap-1.5 text-sm font-semibold bg-[#2563eb] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#1d4ed8] transition-colors"
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add Job
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-5">
           <div className="flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar">
-            {TABS.map((tab) => (
+            {ADMIN_TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
-                    ? "text-purple-700 border-b-2 border-purple-700"
+                    ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-500 hover:text-gray-800"
                   }`}
               >
@@ -127,6 +132,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
         </div>
 
         {activeTab === "Dashboard" && <DashboardTab />}
+        {activeTab === "Analytics" && <AnalyticsTab />}
         {activeTab === "Students" && <StudentsTab onAddStudent={() => setIsAddStudentOpen(true)} />}
         
         {activeTab === "Job Posting" && (
@@ -147,7 +153,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                 initialJobs.map((job) => (
                   <Link
                     key={job.id}
-                    href={`/jobs/${generateJobSlug(job.companyName, job.jobTitle)}`}
+                    href={`/admin/jobs/${generateJobSlug(job.companyName, job.jobTitle)}`}
                     className="block bg-white rounded-xl border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer"
                   >
                     {/* Card Header */}
@@ -207,7 +213,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                     <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
                       {job.status || "Open"}
                     </span>
-                    <span className="text-xs sm:text-sm text-purple-700 font-medium hover:text-purple-900 transition-colors flex items-center gap-1">
+                    <span className="text-xs sm:text-sm text-blue-600 font-medium hover:text-blue-900 transition-colors flex items-center gap-1">
                       View details
                       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </span>
@@ -220,21 +226,25 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
 
           {/* Right Sidebar — desktop only */}
           <aside className="w-[260px] shrink-0 hidden lg:flex flex-col gap-5">
-            {(session?.user as any)?.role === "admin" && (
-              <div className="flex flex-col gap-3">
-                <Button 
-                  onPress={() => setIsJobFormOpen(true)}
-                  className="w-full font-semibold bg-purple-700 text-white shadow-md py-3 rounded-xl hover:bg-purple-800 transition-colors"
+              <div className="flex flex-row gap-2 w-full">
+                <button 
+                  className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#0f9d58] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#0b8043] transition-colors"
                 >
-                  Create Job
-                </Button>
-                <Button 
-                  className="w-full font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md py-3 rounded-xl hover:opacity-90 transition-opacity"
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                  AI JD Parser
+                </button>
+                <button 
+                  onClick={() => setIsJobFormOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#2563eb] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#1d4ed8] transition-colors"
                 >
-                  ✨ AI JD
-                </Button>
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Job
+                </button>
               </div>
-            )}
 
             {/* Popular Tags */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -246,7 +256,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                 {POPULAR_TAGS.map((tag) => (
                   <button
                     key={tag}
-                    className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 transition-colors"
+                    className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
                   >
                     {tag}
                   </button>
@@ -262,7 +272,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
               <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                 Please provide the offer details for the TPOs records and approval
               </p>
-              <button className="mt-3 text-sm font-semibold text-purple-700 hover:text-purple-900 transition-colors flex items-center gap-1">
+              <button className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-900 transition-colors flex items-center gap-1">
                 <span className="text-lg leading-none">+</span> Create Offer
               </button>
             </div>

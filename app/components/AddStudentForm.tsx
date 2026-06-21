@@ -52,7 +52,7 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
 
       {/* Form Header */}
       <div className="flex flex-col gap-1 pb-6 mb-6 border-b border-gray-100 pr-10">
-        <h2 className="text-2xl font-bold tracking-tight text-purple-700">
+        <h2 className="text-2xl font-bold tracking-tight text-blue-600">
           Add New Student
         </h2>
         <p className="text-sm text-gray-500">
@@ -86,7 +86,7 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900 focus:border-purple-600 focus:ring-1 focus:ring-purple-600 focus:outline-none transition-shadow text-sm"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow text-sm"
             />
           </div>
 
@@ -99,7 +99,7 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900 focus:border-purple-600 focus:ring-1 focus:ring-purple-600 focus:outline-none transition-shadow text-sm"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow text-sm"
             />
           </div>
 
@@ -113,12 +113,12 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-10 text-gray-900 focus:border-purple-600 focus:ring-1 focus:ring-purple-600 focus:outline-none transition-shadow text-sm"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-10 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
               >
                 {showPassword ? (
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +137,7 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
           <button
             type="submit"
             disabled={loading}
-            className={`mt-4 w-full bg-purple-700 hover:bg-purple-800 text-white font-medium py-3 rounded-lg transition-colors text-sm flex items-center justify-center ${
+            className={`mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors text-sm flex items-center justify-center ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >

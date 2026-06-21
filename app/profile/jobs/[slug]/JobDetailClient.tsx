@@ -13,7 +13,7 @@ export default function JobDetailClient({ job }: { job: any }) {
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center font-sans">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Job not found</h1>
-          <Link href="/jobs" className="text-purple-700 hover:text-purple-900 font-medium">
+          <Link href="/profile" className="text-purple-700 hover:text-purple-900 font-medium">
             ← Back to Opportunity List
           </Link>
         </div>
@@ -63,7 +63,7 @@ export default function JobDetailClient({ job }: { job: any }) {
          {/* Back Link Overlay */}
          <div className="max-w-[1300px] mx-auto px-6 relative z-10 pt-8">
             <Link
-               href="/jobs"
+               href="/profile"
                className="text-white hover:text-gray-200 transition-colors flex items-center gap-1.5 text-lg font-medium"
             >
                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
