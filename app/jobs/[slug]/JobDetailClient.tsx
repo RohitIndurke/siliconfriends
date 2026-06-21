@@ -25,7 +25,7 @@ export default function JobDetailClient({ job }: { job: any }) {
     <div className="min-h-screen bg-[#f5f5f5] font-sans">
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="mx-auto max-w-[1100px] px-6 py-2 flex items-center justify-between w-full">
+        <div className="mx-auto max-w-[1300px] px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
@@ -61,7 +61,7 @@ export default function JobDetailClient({ job }: { job: any }) {
            priority
          />
          {/* Back Link Overlay */}
-         <div className="max-w-[1200px] mx-auto px-6 relative z-10 pt-8">
+         <div className="max-w-[1300px] mx-auto px-6 relative z-10 pt-8">
             <Link
                href="/jobs"
                className="text-white hover:text-gray-200 transition-colors flex items-center gap-1.5 text-lg font-medium"
@@ -75,7 +75,7 @@ export default function JobDetailClient({ job }: { job: any }) {
       </div>
 
       {/* Content */}
-      <div className="max-w-[1200px] mx-auto px-6 -mt-32 relative z-10 pb-16">
+      <div className="max-w-[1300px] mx-auto px-6 -mt-32 relative z-10 pb-16">
         <div className="flex flex-col lg:flex-row gap-6">
            
            {/* Left Column: Main Card & Details */}
