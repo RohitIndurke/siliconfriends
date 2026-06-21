@@ -10,12 +10,14 @@ import { AddStudentForm } from "../components/AddStudentForm";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import DashboardTab from "./DashboardTab";
+import StudentsTab from "./StudentsTab";
 
-const TABS = ["Opportunities", "Applications", "Offers"] as const;
+const TABS = ["Dashboard", "Job Posting", "Applications", "Students"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
-  const [activeTab, setActiveTab] = useState<Tab>("Opportunities");
+  const [activeTab, setActiveTab] = useState<Tab>("Dashboard");
   const [showEligible, setShowEligible] = useState(true);
   const [showNonEligible, setShowNonEligible] = useState(false);
   const [isJobFormOpen, setIsJobFormOpen] = useState(false);
@@ -38,7 +40,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
     <div className="min-h-screen bg-[#f5f5f5] font-sans">
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
+        <div className="mx-auto max-w-[1300px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
@@ -79,7 +81,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-[1100px] px-4 sm:px-6 py-5">
+      <main className="mx-auto max-w-[1300px] px-4 sm:px-6 py-5">
         {/* Page Title + Admin Buttons (mobile) */}
         <div className="flex items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
@@ -98,10 +100,9 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                 + Create Job
               </button>
               <button
-                onClick={() => setIsAddStudentOpen(true)}
-                className="text-xs font-semibold bg-white text-gray-800 border border-gray-200 shadow-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                className="text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
               >
-                + Add Student
+                ✨ AI JD
               </button>
             </div>
           )}
@@ -125,31 +126,13 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
           </div>
         </div>
 
-        <div className="flex gap-6">
-          {/* Jobs List */}
-          <div className="flex-1 min-w-0">
-            {/* Filter checkboxes */}
-            <div className="flex items-center justify-end gap-4 mb-4">
-              <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={showEligible}
-                  onChange={() => setShowEligible(!showEligible)}
-                  className="w-4 h-4 accent-purple-700 rounded"
-                />
-                Eligible
-              </label>
-              <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={showNonEligible}
-                  onChange={() => setShowNonEligible(!showNonEligible)}
-                  className="w-4 h-4 accent-gray-400 rounded"
-                />
-                Non Eligible
-              </label>
-            </div>
-
+        {activeTab === "Dashboard" && <DashboardTab />}
+        {activeTab === "Students" && <StudentsTab onAddStudent={() => setIsAddStudentOpen(true)} />}
+        
+        {activeTab === "Job Posting" && (
+          <div className="flex gap-6">
+            {/* Jobs List */}
+            <div className="flex-1 min-w-0">
             {/* Job Cards */}
             <div className="flex flex-col gap-4">
               {initialJobs.length === 0 ? (
@@ -238,21 +221,19 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
           {/* Right Sidebar — desktop only */}
           <aside className="w-[260px] shrink-0 hidden lg:flex flex-col gap-5">
             {(session?.user as any)?.role === "admin" && (
-              <>
+              <div className="flex flex-col gap-3">
                 <Button 
                   onPress={() => setIsJobFormOpen(true)}
                   className="w-full font-semibold bg-purple-700 text-white shadow-md py-3 rounded-xl hover:bg-purple-800 transition-colors"
                 >
                   Create Job
                 </Button>
-
                 <Button 
-                  onPress={() => setIsAddStudentOpen(true)}
-                  className="w-full font-semibold bg-white text-gray-800 border-2 border-gray-200 shadow-sm py-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                  className="w-full font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md py-3 rounded-xl hover:opacity-90 transition-opacity"
                 >
-                  Add Student
+                  ✨ AI JD
                 </Button>
-              </>
+              </div>
             )}
 
             {/* Popular Tags */}
@@ -286,7 +267,8 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
               </button>
             </div>
           </aside>
-        </div>
+          </div>
+        )}
       </main>
 
       {/* Create Job Modal Overlay */}
