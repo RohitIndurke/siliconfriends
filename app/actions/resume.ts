@@ -20,6 +20,14 @@ export async function parseResumeAndCompare(formData: FormData) {
     // Parse PDF text
     let resumeText = "";
     if (file.name.toLowerCase().endsWith(".pdf")) {
+      // Polyfill browser DOM objects missing in Node.js to prevent pdf.js from crashing
+      if (typeof globalThis.DOMMatrix === 'undefined') {
+        (globalThis as any).DOMMatrix = class DOMMatrix {};
+      }
+      if (typeof globalThis.Path2D === 'undefined') {
+        (globalThis as any).Path2D = class Path2D {};
+      }
+
       const { PDFParse } = require("pdf-parse");
       const parser = new PDFParse({ data: buffer });
       const pdfData = await parser.getText();
