@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
 
-export default function AiInterviewPrepTab() {
-  const [selectedCategory, setSelectedCategory] = useState("Technical");
+export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(["All"]);
+  const [selectedJob, setSelectedJob] = useState("");
 
-  const categories = ["Technical", "System Design", "Behavioral", "HR"];
+  const categories = ["All", "Technical", "System Design", "Behavioral", "HR"];
+
+  const toggleCategory = (category: string) => {
+    if (category === "All") {
+      setSelectedCategories(["All"]);
+      return;
+    }
+
+    let newCategories = selectedCategories.filter(c => c !== "All");
+
+    if (newCategories.includes(category)) {
+      newCategories = newCategories.filter(c => c !== category);
+      if (newCategories.length === 0) {
+        newCategories = ["All"];
+      }
+    } else {
+      newCategories.push(category);
+    }
+
+    setSelectedCategories(newCategories);
+  };
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300 pb-10">
@@ -11,7 +32,7 @@ export default function AiInterviewPrepTab() {
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 rounded-xl bg-[#f3e8ff] flex items-center justify-center shrink-0">
           <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#a855f7">
-             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
           </svg>
         </div>
         <div>
@@ -33,12 +54,17 @@ export default function AiInterviewPrepTab() {
             TARGET JOB / COMPANY
           </label>
           <div className="relative">
-            <select 
+            <select
               className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm text-[#4b5563] focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow appearance-none cursor-pointer"
-              defaultValue="sde-amazon"
+              value={selectedJob}
+              onChange={(e) => setSelectedJob(e.target.value)}
             >
-              <option value="sde-amazon">Software Development Engineer @ Amazon</option>
-              <option value="da-google">Data Analyst @ Google</option>
+              <option value="" disabled>— Select a role —</option>
+              {jobs.map(job => (
+                <option key={job.id} value={job.id}>
+                  {job.jobTitle} @ {job.companyName}
+                </option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
               <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,12 +83,11 @@ export default function AiInterviewPrepTab() {
             {categories.map(category => (
               <button
                 key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors border ${
-                  selectedCategory === category
+                onClick={() => toggleCategory(category)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors border ${selectedCategories.includes(category)
                     ? 'bg-[#2563eb] text-white border-[#2563eb]'
                     : 'bg-white text-[#4b5563] border-gray-200 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {category}
               </button>

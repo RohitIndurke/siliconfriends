@@ -24,6 +24,7 @@ export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
   const [showNonEligible, setShowNonEligible] = useState(false);
   const [isJobFormOpen, setIsJobFormOpen] = useState(false);
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<any>(null);
 
   const router = useRouter();
 
@@ -173,6 +174,19 @@ export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
                         <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
                           Eligible
                         </span>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setEditingJob(job);
+                          }}
+                          className="bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold px-3 py-0.5 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm ml-1 flex items-center gap-1"
+                        >
+                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Edit
+                        </button>
                       </div>
                     </div>
 
@@ -283,12 +297,15 @@ export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
 
       {/* Create Job Modal Overlay */}
       {isJobFormOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/50 overflow-y-auto backdrop-blur-sm">
-          <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
-            <div className="relative w-full max-w-3xl">
-              <JobCreationForm onClose={() => setIsJobFormOpen(false)} />
-            </div>
-          </div>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <JobCreationForm onClose={() => setIsJobFormOpen(false)} />
+        </div>
+      )}
+
+      {/* Edit Job Modal */}
+      {editingJob && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <JobCreationForm initialData={editingJob} onClose={() => setEditingJob(null)} />
         </div>
       )}
 

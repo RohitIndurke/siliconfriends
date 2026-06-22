@@ -4,6 +4,23 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatDistanceToNow, format } from "date-fns";
 import { useSession } from "@/lib/auth-client";
+import ReactMarkdown from "react-markdown";
+
+const markdownComponents = {
+   p: ({ children }: any) => <p className="mb-4 last:mb-0">{children}</p>,
+   ul: ({ children }: any) => <ul className="list-disc pl-5 mb-4 last:mb-0 space-y-1">{children}</ul>,
+   ol: ({ children }: any) => <ol className="list-decimal pl-5 mb-4 last:mb-0 space-y-1">{children}</ol>,
+   li: ({ children }: any) => <li>{children}</li>,
+   a: ({ href, children }: any) => (
+      <a href={href} className="text-purple-600 hover:text-purple-800 underline" target="_blank" rel="noreferrer">
+         {children}
+      </a>
+   ),
+   strong: ({ children }: any) => <strong className="font-semibold text-gray-900">{children}</strong>,
+   h1: ({ children }: any) => <h1 className="text-xl font-bold text-gray-900 mb-4 mt-6">{children}</h1>,
+   h2: ({ children }: any) => <h2 className="text-lg font-bold text-gray-900 mb-3 mt-5">{children}</h2>,
+   h3: ({ children }: any) => <h3 className="text-base font-bold text-gray-900 mb-2 mt-4">{children}</h3>,
+};
 
 export default function JobDetailClient({ job }: { job: any }) {
    const { data: session } = useSession();
@@ -145,8 +162,10 @@ export default function JobDetailClient({ job }: { job: any }) {
                      {/* Description Box */}
                      <div className="mb-8">
                         <p className="text-sm font-medium text-gray-900 mb-2">Description</p>
-                        <div className="border border-gray-200 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                           {job.description}
+                        <div className="border border-gray-200 rounded-xl p-5 text-sm text-gray-700 leading-relaxed">
+                           <ReactMarkdown components={markdownComponents}>
+                              {job.description}
+                           </ReactMarkdown>
                         </div>
                      </div>
 
@@ -164,8 +183,10 @@ export default function JobDetailClient({ job }: { job: any }) {
                      {job.otherDetails && (
                         <div className="mb-8">
                            <p className="text-sm font-medium text-gray-900 mb-2">Other Details</p>
-                           <div className="border border-gray-200 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                              {job.otherDetails}
+                           <div className="border border-gray-200 rounded-xl p-5 text-sm text-gray-700 leading-relaxed">
+                              <ReactMarkdown components={markdownComponents}>
+                                 {job.otherDetails}
+                              </ReactMarkdown>
                            </div>
                         </div>
                      )}

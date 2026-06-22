@@ -98,7 +98,9 @@ export default function MyApplicationsTab() {
 
       {/* Applications List */}
       <div className="flex flex-col gap-4">
-        {applications.map(app => (
+        {applications
+          .filter(app => activeFilter.startsWith("All") || app.status === activeFilter)
+          .map(app => (
           <div key={app.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6">
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -114,6 +116,11 @@ export default function MyApplicationsTab() {
             {renderStepper(app.currentStep)}
           </div>
         ))}
+        {applications.filter(app => activeFilter.startsWith("All") || app.status === activeFilter).length === 0 && (
+          <div className="text-center py-10 text-gray-500 text-sm">
+            No applications found for this status.
+          </div>
+        )}
       </div>
     </div>
   );

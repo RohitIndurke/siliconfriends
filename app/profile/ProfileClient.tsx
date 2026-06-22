@@ -236,8 +236,8 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
           </div>
         )}
 
-        {activeTab === "AI Resume Builder" && <AiResumeBuilderTab />}
-        {activeTab === "AI Interview Prep" && <AiInterviewPrepTab />}
+        {activeTab === "AI Resume Builder" && <AiResumeBuilderTab jobs={initialJobs} />}
+        {activeTab === "AI Interview Prep" && <AiInterviewPrepTab jobs={initialJobs} />}
         {activeTab === "My Application" && <MyApplicationsTab />}
 
         {/* Placeholder for other Student tabs */}
