@@ -34,10 +34,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Prevent webpack from bundling pdf-parse (and its pdfjs-dist dep) which
-  // references browser-only APIs like DOMMatrix. Loading it as a plain CJS
-  // external avoids the "DOMMatrix is not defined" runtime crash.
-  serverExternalPackages: ["pdf-parse"],
+  // Prevent webpack from bundling pdf2json which uses node.js native modules
+  serverExternalPackages: ["pdf2json"],
   async headers() {
     return [
       {
