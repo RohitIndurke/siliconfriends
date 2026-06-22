@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# S-09: Local SQLite database files — may contain real user records & password hashes
+local.db
+*.db
+*.sqlite
+*.sqlite3

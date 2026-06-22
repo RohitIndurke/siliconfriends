@@ -1,14 +1,12 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { getTypedSession } from "@/lib/session";
 
 export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // S-04: Use typed session helper — no more (session.user as any).role
+  const session = await getTypedSession();
 
   if (session) {
-    if ((session.user as any).role === "admin") {
+    if (session.user.role === "admin") {
       redirect("/admin");
     } else {
       redirect("/profile");

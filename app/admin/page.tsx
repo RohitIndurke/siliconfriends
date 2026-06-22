@@ -2,20 +2,18 @@ import { db } from "@/db";
 import { job } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import AdminClient from "./AdminClient";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { getTypedSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 export default async function AdminPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // S-04: Use typed session helper — no more (session.user as any).role
+  const session = await getTypedSession();
 
   if (!session) {
     redirect("/login");
   }
 
-  if ((session.user as any).role !== "admin") {
+  if (session.user.role !== "admin") {
     redirect("/profile");
   }
 

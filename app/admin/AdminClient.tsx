@@ -286,7 +286,7 @@ export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
         <div className="fixed inset-0 z-[100] bg-black/50 overflow-y-auto backdrop-blur-sm">
           <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
             <div className="relative w-full max-w-3xl">
-              <JobCreationForm onClose={() => setIsJobFormOpen(false)} userId={session?.user?.id || ""} />
+              <JobCreationForm onClose={() => setIsJobFormOpen(false)} />
             </div>
           </div>
         </div>

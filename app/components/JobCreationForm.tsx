@@ -104,10 +104,10 @@ const ALL_COURSES = [
 
 export interface JobCreationFormProps {
     onClose?: () => void;
-    userId: string;
+    // S-11: userId removed — Server Action reads it from the server-side session
 }
 
-export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, userId }) => {
+export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose }) => {
     const [formData, setFormData] = useState<JobFormState>(INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [showToast, setShowToast] = useState(false);
@@ -142,9 +142,8 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, userI
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            console.log("Submitting Full Job Payload:", formData);
-            
-            const result = await createJobAction(formData, userId);
+            // S-07: console.log removed — never log sensitive form data to the browser
+            const result = await createJobAction(formData);
             
             if (result.success) {
                 setShowToast(true);
