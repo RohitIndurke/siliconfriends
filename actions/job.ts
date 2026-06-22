@@ -40,3 +40,30 @@ export async function createJobAction(data: any) {
     return { success: false, error: "Failed to create job. Please try again." };
   }
 }
+
+export async function updateJobAction(jobId: string, data: any) {
+  const session = await getTypedSession();
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (session.user.role !== "admin") {
+    return { success: false, error: "Forbidden" };
+  }
+
+  try {
+    // Use require context mapping or direct drizzle update
+    const { eq } = await import("drizzle-orm");
+    await db.update(job).set({
+      ...data,
+      updatedAt: new Date(),
+    }).where(eq(job.id, jobId));
+
+    revalidatePath("/admin");
+    revalidatePath("/profile");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating job:", error);
+    return { success: false, error: "Failed to update job. Please try again." };
+  }
+}
