@@ -71,9 +71,10 @@ export default function AnalyticsTab() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-base font-bold text-gray-900 mb-6">Company-wise Placements</h3>
-          <div className="h-[250px] flex items-end justify-between relative pl-8 pb-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
+          <h3 className="text-base font-bold text-gray-900 mb-4 sm:mb-6">Company-wise Placements</h3>
+          <div className="overflow-x-auto">
+            <div className="h-[220px] sm:h-[250px] flex items-end justify-between relative pl-8 pb-8 min-w-[280px]">
              {/* Y-Axis */}
              <div className="absolute left-0 top-0 bottom-8 w-6 flex flex-col justify-between text-[10px] text-gray-400 font-mono text-right">
                 <span>20</span>
@@ -106,13 +107,14 @@ export default function AnalyticsTab() {
                    <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">{company.label}</span>
                 </div>
              ))}
+            </div>
           </div>
         </div>
 
         {/* Donut Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-base font-bold text-gray-900 mb-6">Department-wise Distribution</h3>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 h-[250px]">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
+          <h3 className="text-base font-bold text-gray-900 mb-4 sm:mb-6">Department-wise Distribution</h3>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-16 h-auto sm:h-[250px] py-4 sm:py-0">
              <div className="relative w-48 h-48">
                 {/* CSS SVG Donut Chart */}
                 <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 drop-shadow-sm">
@@ -151,9 +153,15 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Bottom Area Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
-        <h3 className="text-base font-bold text-gray-900 mb-6">Monthly Applications vs Placements Trend</h3>
-        <div className="h-[250px] relative w-full flex items-end pl-8 pb-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
+          <h3 className="text-base font-bold text-gray-900">Monthly Applications vs Placements Trend</h3>
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block bg-blue-500 rounded"></span>Applications</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block bg-green-500 rounded"></span>Placements</span>
+          </div>
+        </div>
+        <div className="h-[180px] sm:h-[250px] relative w-full flex items-end pl-8 pb-8">
            {/* Y-Axis */}
            <div className="absolute left-0 top-0 bottom-6 w-6 flex flex-col justify-between text-[10px] text-gray-400 font-mono text-right">
               <span>120</span>
@@ -171,7 +179,7 @@ export default function AnalyticsTab() {
            </div>
            
            {/* X-Axis Labels */}
-           <div className="absolute left-8 right-0 -bottom-2 flex justify-between text-[10px] text-gray-400 px-4">
+           <div className="absolute left-8 right-0 bottom-0 flex justify-between text-[10px] text-gray-400 px-4">
               <span>Oct</span>
               <span>Nov</span>
               <span>Dec</span>

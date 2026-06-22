@@ -88,8 +88,69 @@ export default function StudentsTab({ onAddStudent }: StudentsTabProps) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {students.map((student, i) => (
+          <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 border border-blue-100">
+                  {student.initials}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{student.name}</p>
+                  <p className="text-xs text-gray-500 font-mono">{student.roll}</p>
+                </div>
+              </div>
+              <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide uppercase ${student.statusBg} ${student.statusText}`}>
+                {student.status}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div>
+                <p className="text-gray-400 mb-0.5">Department</p>
+                <p className="font-medium text-gray-700">{student.dept}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 mb-0.5">CGPA</p>
+                <p className={`font-bold ${student.cgpaColor}`}>{student.cgpa}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-gray-400 mb-1">Email</p>
+                <p className="text-gray-600 truncate">{student.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-wrap gap-1.5">
+                {student.skills.map((skill, j) => (
+                  <span key={j} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md">
+                    {skill}
+                  </span>
+                ))}
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md">
+                  {student.extraSkills}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-400 shrink-0 ml-2">
+                <button className="hover:text-blue-600 transition-colors" title="View Details">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+                <button className="hover:text-blue-600 transition-colors" title="Send Message">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-gray-500 border-b border-gray-100 bg-gray-50/50">
