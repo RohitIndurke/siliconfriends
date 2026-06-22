@@ -75,7 +75,7 @@ export default function DashboardTab() {
             <h3 className="text-lg font-bold text-gray-900">Recent Applications</h3>
             <span className="text-xs font-mono text-gray-400">8 total</span>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden sm:block">
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-gray-500 border-b border-gray-100 bg-gray-50/50">
                 <tr>
@@ -112,6 +112,31 @@ export default function DashboardTab() {
                 ))}
               </tbody>
             </table>
+          </div>
+          {/* Mobile card list */}
+          <div className="flex flex-col divide-y divide-gray-50 sm:hidden">
+            {[
+              { name: "Arjun Sharma", id: "CS2021001", role: "Software Engineer L3", company: "Google", date: "Jan 15, 2024", status: "Shortlisted", statusColor: "bg-yellow-100 text-yellow-700" },
+              { name: "Priya Patel", id: "CS2021002", role: "Cloud Engineer", company: "Microsoft", date: "Jan 12, 2024", status: "Selected", statusColor: "bg-green-100 text-green-700" },
+              { name: "Rahul Kumar", id: "EC2021003", role: "Systems Engineer", company: "Infosys", date: "Jan 18, 2024", status: "Applied", statusColor: "bg-blue-100 text-blue-700" },
+              { name: "Sneha Gupta", id: "CS2021004", role: "ML Engineer", company: "Amazon", date: "Jan 10, 2024", status: "Interview", statusColor: "bg-purple-100 text-purple-700" },
+              { name: "Ananya Reddy", id: "CS2021006", role: "Frontend Engineer", company: "Google", date: "Jan 20, 2024", status: "Applied", statusColor: "bg-blue-100 text-blue-700" },
+              { name: "Karan Mehta", id: "IT2021007", role: "Product Analyst", company: "Flipkart", date: "Jan 8, 2024", status: "Rejected", statusColor: "bg-red-100 text-red-700" },
+            ].map((row, i) => (
+              <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 text-sm">{row.name}</p>
+                    <p className="text-xs text-gray-500 font-mono mb-1">{row.id}</p>
+                    <p className="text-xs text-gray-600">{row.role} · <span className="font-medium">{row.company}</span></p>
+                    <p className="text-xs text-gray-400 font-mono mt-0.5">{row.date}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-wide uppercase shrink-0 ${row.statusColor}`}>
+                    {row.status}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
