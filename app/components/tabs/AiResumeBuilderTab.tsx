@@ -24,35 +24,37 @@ export default function AiResumeBuilderTab() {
       </div>
 
       {/* Stepper */}
-      <div className="flex items-center w-full max-w-5xl">
-        {/* Step 1 */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white flex items-center justify-center text-sm font-bold shadow-sm">
-            1
+      <div className="overflow-x-auto -mx-1 px-1">
+        <div className="flex items-center w-full min-w-[320px] max-w-5xl">
+          {/* Step 1 */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white flex items-center justify-center text-sm font-bold shadow-sm">
+              1
+            </div>
+            <span className="text-sm font-bold text-[#111827] whitespace-nowrap">Select Job</span>
           </div>
-          <span className="text-sm font-bold text-[#111827]">Select Job</span>
-        </div>
-        
-        {/* Line */}
-        <div className="flex-1 h-px bg-gray-200 mx-4"></div>
-        
-        {/* Step 2 */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-7 h-7 rounded-full bg-[#f3f4f6] text-[#6b7280] flex items-center justify-center text-sm font-bold">
-            2
+          
+          {/* Line */}
+          <div className="flex-1 h-px bg-gray-200 mx-3 sm:mx-4"></div>
+          
+          {/* Step 2 */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-[#f3f4f6] text-[#6b7280] flex items-center justify-center text-sm font-bold">
+              2
+            </div>
+            <span className="text-sm font-semibold text-[#6b7280] whitespace-nowrap">Review Info</span>
           </div>
-          <span className="text-sm font-semibold text-[#6b7280]">Review Info</span>
-        </div>
 
-        {/* Line */}
-        <div className="flex-1 h-px bg-gray-200 mx-4"></div>
+          {/* Line */}
+          <div className="flex-1 h-px bg-gray-200 mx-3 sm:mx-4"></div>
 
-        {/* Step 3 */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-7 h-7 rounded-full bg-[#f3f4f6] text-[#6b7280] flex items-center justify-center text-sm font-bold">
-            3
+          {/* Step 3 */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-[#f3f4f6] text-[#6b7280] flex items-center justify-center text-sm font-bold">
+              3
+            </div>
+            <span className="text-sm font-semibold text-[#6b7280] whitespace-nowrap">Generated Resume</span>
           </div>
-          <span className="text-sm font-semibold text-[#6b7280]">Generated Resume</span>
         </div>
       </div>
 

@@ -177,7 +177,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, userI
                 <span className="font-semibold text-sm">Job Profile successfully created!</span>
             </div>
         )}
-        <div className="w-full max-w-4xl mx-auto my-auto p-8 bg-white text-gray-900 rounded-2xl shadow-2xl transition-all relative max-h-[90vh] overflow-y-auto no-scrollbar">
+        <div className="w-full max-w-4xl mx-auto my-auto p-5 sm:p-8 bg-white text-gray-900 rounded-2xl shadow-2xl transition-all relative max-h-[90vh] overflow-y-auto no-scrollbar">
             {/* Close Button */}
             {onClose && (
                 <button 
