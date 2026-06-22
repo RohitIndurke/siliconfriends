@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { parseResumeAndCompare } from '@/app/actions/resume';
+import { parseResumeAndCompare, getRecentResumes, deleteRecentResume } from '@/app/actions/resume';
+import { toast } from "@heroui/react";
 
 const markdownComponents = {
   p: ({ children }: any) => <span className="inline">{children}</span>,
@@ -39,6 +40,20 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [recentResumes, setRecentResumes] = useState<any[]>([]);
+  const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (step === 2) {
+      setIsLoadingResumes(true);
+      getRecentResumes().then(res => {
+        setRecentResumes(res);
+        setIsLoadingResumes(false);
+      });
+    }
+  }, [step]);
 
   // Step 3 State (Extracted Data Form)
   const [resumeData, setResumeData] = useState({
@@ -97,7 +112,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       const result = await parseResumeAndCompare(formData);
 
       if (result.error) {
-        alert(result.error);
+        toast.danger(result.error);
         setIsParsing(false);
         return;
       }
@@ -120,12 +135,74 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       setMissingGapAnalysis(Array.isArray(result.missingGapAnalysis) ? result.missingGapAnalysis : []);
       setAtsKeywords(Array.isArray(result.atsKeywordSummary) ? result.atsKeywordSummary : []);
 
+      toast.success("Resume processed successfully by AI ✨");
       setStep(3);
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Failed to parse resume.");
+      toast.danger(err.message || "Failed to parse resume.");
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleUseRecentResume = async (resumeId: string) => {
+    setIsParsing(true);
+    try {
+      const formData = new FormData();
+      formData.append("resumeId", resumeId);
+
+      const jobDesc = activeJob
+        ? `${activeJob.jobTitle} at ${activeJob.companyName}. Description: ${activeJob.description}. Required Skills: ${activeJob.requiredSkills}. Good to have: ${activeJob.goodToHaveSkills}`
+        : MOCK_JOB_REQUIREMENTS.join(", ");
+
+      formData.append("jobDescription", jobDesc);
+
+      const result = await parseResumeAndCompare(formData);
+
+      if (result.error) {
+        toast.danger(result.error);
+        setIsParsing(false);
+        return;
+      }
+
+      setResumeData({
+        name: result.name || "",
+        email: result.email || "",
+        socials: Array.isArray(result.socials) ? result.socials.join(', ') : (typeof result.socials === 'string' ? result.socials : ""),
+        education: result.education || "",
+        certifications: result.certifications || "",
+        executiveSummary: result.executiveSummary || "",
+        tailoredExperience: result.tailoredExperience || "",
+        categorizedSkills: {
+          technical: Array.isArray(result.categorizedSkills?.technical) ? result.categorizedSkills.technical : [],
+          tools: Array.isArray(result.categorizedSkills?.tools) ? result.categorizedSkills.tools : [],
+          soft: Array.isArray(result.categorizedSkills?.soft) ? result.categorizedSkills.soft : [],
+        },
+      });
+
+      setMissingGapAnalysis(Array.isArray(result.missingGapAnalysis) ? result.missingGapAnalysis : []);
+      setAtsKeywords(Array.isArray(result.atsKeywordSummary) ? result.atsKeywordSummary : []);
+
+      toast.success("Resume processed successfully by AI ✨");
+      setStep(3);
+    } catch (err: any) {
+      console.error(err);
+      toast.danger(err.message || "Failed to load resume.");
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const handleDeleteRecentResume = async (resumeId: string) => {
+    // Optimistic update
+    setRecentResumes(prev => prev.filter(r => r.id !== resumeId));
+    setConfirmDeleteId(null);
+    toast.success("Resume deleted successfully");
+
+    const res = await deleteRecentResume(resumeId);
+    if (res.error) {
+      toast.danger(res.error);
+      getRecentResumes().then(setRecentResumes);
     }
   };
 
@@ -133,6 +210,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
+      toast.success("AI optimization complete: Your job-ready resume is prepared! ✨");
       setStep(4);
     }, 7700);
   };
@@ -141,7 +219,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
     setIsDownloading(true);
     try {
       const { pdf, Document, Page, Text, View, StyleSheet } = await import('@react-pdf/renderer');
-      
+
       const styles = StyleSheet.create({
         page: { padding: 40, fontFamily: 'Helvetica', fontSize: 11, color: '#111827' },
         header: { marginBottom: 20, textAlign: 'center', borderBottom: '1pt solid #111827', paddingBottom: 15 },
@@ -154,7 +232,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
         skillCategory: { width: 120, fontSize: 10, fontWeight: 'bold' },
         skillList: { flex: 1, fontSize: 10 }
       });
-      
+
       const doc = (
         <Document>
           <Page size="A4" style={styles.page}>
@@ -216,9 +294,10 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       link.download = `${resumeData.name.replace(/\s+/g, '_')}_Resume.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+      toast.success("Resume downloaded successfully!");
     } catch (err: any) {
       console.error("PDF Generation Error:", err);
-      alert(`Failed to generate PDF: ${err.message || "Unknown error"}`);
+      toast.danger(`Failed to generate PDF: ${err.message || "Unknown error"}`);
     } finally {
       setIsDownloading(false);
     }
@@ -328,36 +407,88 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           </div>
 
           {!isParsing ? (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                }`}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileSelect}
-              />
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
+            <>
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                  }`}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileSelect}
+                />
+                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                </div>
+                <p className="text-base font-bold text-gray-900 mb-1">Drag and drop your resume here</p>
+                <p className="text-sm text-gray-500">Supports PDF, DOC, DOCX (Max 5MB)</p>
+                <button className="mt-6 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium py-2 px-6 rounded-md shadow-sm transition-colors text-sm">
+                  Browse Files
+                </button>
               </div>
-              <p className="text-base font-bold text-gray-900 mb-1">Drag and drop your resume here</p>
-              <p className="text-sm text-gray-500">Supports PDF, DOC, DOCX (Max 5MB)</p>
-              <button className="mt-6 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium py-2 px-6 rounded-md shadow-sm transition-colors text-sm">
-                Browse Files
-              </button>
-            </div>
+
+              {recentResumes.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-gray-100">
+                  <h4 className="text-[13px] font-bold text-gray-500 uppercase tracking-wider mb-4">Or use a recently uploaded resume</h4>
+                  <div className="space-y-3">
+                    {recentResumes.map(resume => (
+                      <div key={resume.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/50 transition-all shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6b7280">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">{resume.fileName}</p>
+                            <p className="text-xs font-medium text-gray-500">Uploaded on {new Date(resume.createdAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {confirmDeleteId === resume.id ? (
+                            <div className="flex items-center gap-2 bg-red-50 px-2 py-1.5 rounded-md border border-red-100">
+                              <span className="text-[11px] font-bold text-red-600 uppercase tracking-wider">Confirm:</span>
+                              <button onClick={() => handleDeleteRecentResume(resume.id)} className="text-xs font-bold bg-red-600 text-white px-2 py-1 rounded shadow-sm hover:bg-red-700 transition-colors">Yes</button>
+                              <button onClick={() => setConfirmDeleteId(null)} className="text-xs font-bold text-gray-500 hover:text-gray-700 px-1 transition-colors">No</button>
+                            </div>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleUseRecentResume(resume.id)}
+                                className="text-sm font-semibold py-1.5 px-4 bg-white border border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-300 rounded-md shadow-sm transition-colors"
+                              >
+                                Continue
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(resume.id)}
+                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                title="Delete resume"
+                              >
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="py-12 flex flex-col items-center justify-center text-center">
               <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Analyzing Resume...</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Analyzing Resume with AI...</h3>
               <p className="text-sm text-gray-500 max-w-[250px] animate-pulse">
                 Extracting skills, experience, and contact information...
               </p>
@@ -564,9 +695,9 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 max-w-[600px] mx-auto w-full flex flex-col items-center justify-center text-center mt-10">
               <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Perfecting your resume for the job...</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">AI is crafting your ATS friendly resume...</h3>
               <p className="text-sm text-gray-500 max-w-[280px] animate-pulse">
-                Applying action + metric methodology and weaving in high-priority ATS keywords...
+                Optimizing your experience with targeted ATS keywords and impact metrics.
               </p>
             </div>
           )}
@@ -588,12 +719,11 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
               >
                 Start Over
               </button>
-              <button 
+              <button
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors flex items-center gap-2 shadow-sm ${
-                  isDownloading ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-                }`}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors flex items-center gap-2 shadow-sm ${isDownloading ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                  }`}
               >
                 {isDownloading ? (
                   <>

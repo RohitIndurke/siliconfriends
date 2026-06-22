@@ -1,41 +1,115 @@
 "use server";
 
+import { db } from "@/db";
+import { userResume } from "@/db/schema";
+import { getTypedSession } from "@/lib/session";
+import { desc, eq, and } from "drizzle-orm";
+import crypto from "crypto";
+
+export async function getRecentResumes() {
+  try {
+    const session = await getTypedSession();
+    if (!session?.user?.id) return [];
+
+    const resumes = await db.select({
+      id: userResume.id,
+      fileName: userResume.fileName,
+      createdAt: userResume.createdAt,
+    }).from(userResume)
+      .where(eq(userResume.userId, session.user.id))
+      .orderBy(desc(userResume.createdAt))
+      .limit(5);
+    
+    return resumes;
+  } catch (err) {
+    console.error("Failed to get recent resumes", err);
+    return [];
+  }
+}
+
+export async function deleteRecentResume(resumeId: string) {
+  try {
+    const session = await getTypedSession();
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    await db.delete(userResume)
+      .where(
+        and(
+          eq(userResume.id, resumeId),
+          eq(userResume.userId, session.user.id)
+        )
+      );
+    
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to delete recent resume", err);
+    return { error: "Failed to delete resume" };
+  }
+}
+
 export async function parseResumeAndCompare(formData: FormData) {
   try {
     const file = formData.get("resume") as File | null;
+    const resumeId = formData.get("resumeId") as string | null;
     const jobDescription = formData.get("jobDescription") as string | null;
 
-    if (!file) {
-      throw new Error("No resume file provided");
+    if (!file && !resumeId) {
+      throw new Error("No resume provided");
     }
 
     if (!jobDescription) {
       throw new Error("No job description provided");
     }
 
-    // Read the file buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     // Parse PDF text
     let resumeText = "";
-    if (file.name.toLowerCase().endsWith(".pdf")) {
-      resumeText = await new Promise<string>((resolve, reject) => {
-        const PDFParser = require("pdf2json");
-        const pdfParser = new PDFParser(null, 1);
-        
-        pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError?.message || "PDF parsing failed")));
-        pdfParser.on("pdfParser_dataReady", () => {
-            resolve(pdfParser.getRawTextContent());
+    let fileName = "";
+    if (file) {
+      fileName = file.name;
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      if (file.name.toLowerCase().endsWith(".pdf")) {
+        resumeText = await new Promise<string>((resolve, reject) => {
+          const PDFParser = require("pdf2json");
+          const pdfParser = new PDFParser(null, 1);
+          
+          pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError?.message || "PDF parsing failed")));
+          pdfParser.on("pdfParser_dataReady", () => {
+              resolve(pdfParser.getRawTextContent());
+          });
+          
+          pdfParser.parseBuffer(buffer);
         });
-        
-        pdfParser.parseBuffer(buffer);
-      });
-    } else {
-      // For basic doc/docx, we might just try to decode text or return error if not supported,
-      // but for simplicity, let's assume it's just text if not PDF or try to parse
-      // (a robust app would use mammoth for docx, but we focus on PDF/OpenRouter here)
-      resumeText = buffer.toString("utf-8");
+      } else {
+        resumeText = buffer.toString("utf-8");
+      }
+
+      // Save to database
+      const session = await getTypedSession();
+      if (session?.user?.id) {
+        await db.insert(userResume).values({
+          id: crypto.randomUUID(),
+          userId: session.user.id,
+          fileName: fileName,
+          resumeText: resumeText,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    } else if (resumeId) {
+      const session = await getTypedSession();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized to access saved resume");
+      }
+      const existingResume = await db.select().from(userResume).where(eq(userResume.id, resumeId)).get();
+      if (!existingResume || existingResume.userId !== session.user.id) {
+        throw new Error("Resume not found");
+      }
+      resumeText = existingResume.resumeText;
+      fileName = existingResume.fileName;
     }
 
     // Call OpenRouter API

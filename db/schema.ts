@@ -91,3 +91,12 @@ export const job = sqliteTable("job", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
   createdBy: text("createdBy").notNull().references(() => user.id)
 });
+
+export const userResume = sqliteTable("userResume", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id),
+  fileName: text("fileName").notNull(),
+  resumeText: text("resumeText").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull()
+});
