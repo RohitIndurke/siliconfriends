@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { createJobAction, updateJobAction } from "@/actions/job";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface JobFormState {
     jobTitle: string;
@@ -110,7 +111,6 @@ export interface JobCreationFormProps {
 export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initialData }) => {
     const [formData, setFormData] = useState<JobFormState>(initialData || INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [showToast, setShowToast] = useState(false);
     const router = useRouter();
 
     const toggleCourse = (course: string) => {
@@ -150,11 +150,9 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
             }
 
             if (result.success) {
-                setShowToast(true);
-                router.refresh(); // Refresh the page to fetch the new data
-
+                toast.success(initialData?.id ? "Job profile updated successfully!" : "Job profile created successfully!");
+                router.refresh();
                 setTimeout(() => {
-                    setShowToast(false);
                     if (onClose) onClose();
                 }, 1500);
             } else {
@@ -170,16 +168,6 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
 
     return (
         <>
-            {/* Success Toast */}
-            {showToast && (
-                <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 99999 }}
-                    className="flex items-center gap-3 bg-green-600 text-white px-6 py-3 rounded-xl shadow-2xl animate-bounce-in">
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="font-semibold text-sm">Job Profile successfully created!</span>
-                </div>
-            )}
             <div className="w-full max-w-4xl mx-auto my-auto p-5 sm:p-8 bg-white text-gray-900 rounded-2xl shadow-2xl transition-all relative max-h-[90vh] overflow-y-auto no-scrollbar">
                 {/* Close Button */}
                 {onClose && (

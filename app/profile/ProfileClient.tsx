@@ -4,8 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { POPULAR_TAGS, generateJobSlug } from "../components/data";
-import { Button } from "@heroui/react";
-import { addToast } from "@heroui/toast";
+import { toast } from "sonner";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
@@ -85,13 +84,6 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7C3AED"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Jobs</h1>
-            <Button 
-              size="sm" 
-              className="ml-2 bg-green-100 text-green-700 font-medium" 
-              onPress={() => addToast({ title: "Toast working!", description: "This is a test toast.", color: "success" })}
-            >
-              Test Toast
-            </Button>
           </div>
           {/* Admin buttons visible on mobile in header row */}
 

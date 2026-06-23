@@ -9,7 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@heroui/react": "^3.2.0",
+    "@heroui/react": "^3.2.1",
+    "@heroui/styles": "^3.2.1",
     "@heroui/toast": "^2.0.22",
     "@libsql/client": "^0.17.4",
     "@nanostores/react": "^1.1.0",
@@ -21,12 +22,13 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "modern-screenshot": "^4.7.0",
-    "nanostores": "^1.3.0",
+    "nanostores": "0.10.3",
     "next": "16.2.9",
     "pdf2json": "^4.0.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "sonner": "^2.0.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
