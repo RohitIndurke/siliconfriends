@@ -91,7 +91,7 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
 
         {/* Tabs */}
 
-        <div className="border-b border-gray-200 mb-5">
+        <div className="border-b border-gray-200 mb-5 sticky top-[52px] sm:top-[60px] z-40 bg-[#f5f5f5] pt-2 pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6">
           <div className="flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar">
             {STUDENT_TABS.map((tab) => (
               <button

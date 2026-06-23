@@ -100,3 +100,22 @@ export const userResume = sqliteTable("userResume", {
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull()
 });
+
+// Persists AI-generated interview question sets so they can be served from cache
+// if the AI call fails on a retry, or if the user revisits the same config.
+export const interviewSession = sqliteTable("interviewSession", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id),
+  jobId: text("jobId").notNull().references(() => job.id),
+  // JSON array of selected category strings, e.g. ["Coding / DSA", "Behavioral"]
+  categories: text("categories", { mode: "json" }).$type<string[]>().notNull(),
+  // JSON array of question objects: { category, question, answer, difficulty, source }
+  questions: text("questions", { mode: "json" }).$type<{
+    category: string;
+    question: string;
+    answer: string;
+    difficulty: "Easy" | "Medium" | "Hard";
+    source: "resume" | "category" | "position";
+  }[]>().notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
