@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { parseResumeAndCompare, getRecentResumes, deleteRecentResume } from '@/app/actions/resume';
-import { toast } from "@heroui/react";
+import { toast } from "sonner";
 
 const markdownComponents = {
   p: ({ children }: any) => <span className="inline">{children}</span>,
@@ -99,6 +99,9 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
   const startParsing = async (file: File) => {
     setIsParsing(true);
+    toast.success(`"${file.name}" uploaded successfully!`, {
+      description: "Analyzing your resume with AI...",
+    });
     try {
       const formData = new FormData();
       formData.append("resume", file);
@@ -112,7 +115,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       const result = await parseResumeAndCompare(formData);
 
       if (result.error) {
-        toast.danger(result.error);
+        toast.error(result.error);
         setIsParsing(false);
         return;
       }
@@ -139,7 +142,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       setStep(3);
     } catch (err: any) {
       console.error(err);
-      toast.danger(err.message || "Failed to parse resume.");
+      toast.error(err.message || "Failed to parse resume.");
     } finally {
       setIsParsing(false);
     }
@@ -147,6 +150,10 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
   const handleUseRecentResume = async (resumeId: string) => {
     setIsParsing(true);
+    const resume = recentResumes.find(r => r.id === resumeId);
+    toast.success(resume?.fileName ? `"${resume.fileName}" loaded!` : "Resume loaded!", {
+      description: "Analyzing your resume with AI...",
+    });
     try {
       const formData = new FormData();
       formData.append("resumeId", resumeId);
@@ -160,7 +167,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       const result = await parseResumeAndCompare(formData);
 
       if (result.error) {
-        toast.danger(result.error);
+        toast.error(result.error);
         setIsParsing(false);
         return;
       }
@@ -187,7 +194,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       setStep(3);
     } catch (err: any) {
       console.error(err);
-      toast.danger(err.message || "Failed to load resume.");
+      toast.error(err.message || "Failed to load resume.");
     } finally {
       setIsParsing(false);
     }
@@ -201,7 +208,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
     const res = await deleteRecentResume(resumeId);
     if (res.error) {
-      toast.danger(res.error);
+      toast.error(res.error);
       getRecentResumes().then(setRecentResumes);
     }
   };
@@ -297,7 +304,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       toast.success("Resume downloaded successfully!");
     } catch (err: any) {
       console.error("PDF Generation Error:", err);
-      toast.danger(`Failed to generate PDF: ${err.message || "Unknown error"}`);
+      toast.error(`Failed to generate PDF: ${err.message || "Unknown error"}`);
     } finally {
       setIsDownloading(false);
     }
