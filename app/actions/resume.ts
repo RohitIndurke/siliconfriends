@@ -90,14 +90,30 @@ export async function parseResumeAndCompare(formData: FormData) {
       // Save to database
       const session = await getTypedSession();
       if (session?.user?.id) {
-        await db.insert(userResume).values({
-          id: crypto.randomUUID(),
-          userId: session.user.id,
-          fileName: fileName,
-          resumeText: resumeText,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
+        // Check for exact duplicate
+        const existingResume = await db.select().from(userResume).where(
+          and(
+            eq(userResume.userId, session.user.id),
+            eq(userResume.fileName, fileName),
+            eq(userResume.resumeText, resumeText)
+          )
+        ).get();
+
+        if (existingResume) {
+          // Move to top of recently used
+          await db.update(userResume)
+            .set({ createdAt: new Date(), updatedAt: new Date() })
+            .where(eq(userResume.id, existingResume.id));
+        } else {
+          await db.insert(userResume).values({
+            id: crypto.randomUUID(),
+            userId: session.user.id,
+            fileName: fileName,
+            resumeText: resumeText,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
       }
     } else if (resumeId) {
       const session = await getTypedSession();

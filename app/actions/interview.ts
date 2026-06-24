@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { interviewSession, userResume, job } from "@/db/schema";
+import { interviewSession, userResume, job, interviewQuestionBank } from "@/db/schema";
 import { getTypedSession } from "@/lib/session";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray, or } from "drizzle-orm";
 import crypto from "crypto";
 
 export type InterviewQuestion = {
@@ -76,7 +76,7 @@ export async function generateInterviewQuestions(
           categories.length === cachedCats.length &&
           categories.every((c) => cachedCats.includes(c));
 
-        if (sameCategories) {
+        if (sameCategories && (cached.questions as InterviewQuestion[]).length >= 30) {
           return {
             questions: cached.questions as InterviewQuestion[],
             fromCache: true,
@@ -98,8 +98,8 @@ export async function generateInterviewQuestions(
       const now = new Date().getTime();
       const diffMinutes = (now - lastGenerationTime) / (1000 * 60);
 
-      if (diffMinutes < 15) {
-        const remaining = Math.ceil(15 - diffMinutes);
+      if (diffMinutes < 1) {
+        const remaining = Math.ceil(1 - diffMinutes);
         return { error: `Please wait ${remaining} minute${remaining > 1 ? 's' : ''} before generating new questions to prevent AI rate limiting.` };
       }
     }
@@ -150,15 +150,31 @@ Selection Process: ${jobRecord.selectionProcess}
         resumeText = buffer.toString("utf-8");
       }
 
-      // Save resume to userResume table (reuse across both features)
-      await db.insert(userResume).values({
-        id: crypto.randomUUID(),
-        userId,
-        fileName,
-        resumeText,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      // Check for exact duplicate
+      const existingResume = await db.select().from(userResume).where(
+        and(
+          eq(userResume.userId, userId),
+          eq(userResume.fileName, fileName),
+          eq(userResume.resumeText, resumeText)
+        )
+      ).get();
+
+      if (existingResume) {
+        // Move to top of recently used
+        await db.update(userResume)
+          .set({ createdAt: new Date(), updatedAt: new Date() })
+          .where(eq(userResume.id, existingResume.id));
+      } else {
+        // Save new resume to userResume table
+        await db.insert(userResume).values({
+          id: crypto.randomUUID(),
+          userId,
+          fileName,
+          resumeText,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
     } else if (resumeId) {
       const savedResume = await db
         .select()
@@ -170,6 +186,36 @@ Selection Process: ${jobRecord.selectionProcess}
       resumeText = savedResume.resumeText;
       fileName = savedResume.fileName;
     }
+
+    // ── 3.5. Retrieve unseen DB Questions ─────────────────────────────────────
+    const pastSessions = await db.select({ questions: interviewSession.questions })
+      .from(interviewSession)
+      .where(eq(interviewSession.userId, userId));
+    const seenQuestions = new Set<string>();
+    pastSessions.forEach(s => {
+      if (s.questions) {
+        (s.questions as InterviewQuestion[]).forEach(q => seenQuestions.add(q.question));
+      }
+    });
+
+    const poolQuestions = await db.select().from(interviewQuestionBank).where(
+      or(
+        inArray(interviewQuestionBank.category, categories),
+        eq(interviewQuestionBank.jobId, jobId)
+      )
+    );
+    const unseenPoolQuestions = poolQuestions.filter(q => !seenQuestions.has(q.question));
+    const shuffledPool = unseenPoolQuestions.sort(() => 0.5 - Math.random());
+    const selectedDbQuestions = shuffledPool.slice(0, 10).map(q => ({
+      category: q.category,
+      question: q.question,
+      answer: q.answer,
+      difficulty: q.difficulty as "Easy" | "Medium" | "Hard",
+      source: q.source as "category" | "position"
+    }));
+
+    const deficit = 10 - selectedDbQuestions.length;
+    const totalAiQuestions = 20 + deficit;
 
     // ── 4. Call OpenRouter AI ─────────────────────────────────────────────────
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -183,8 +229,11 @@ Selection Process: ${jobRecord.selectionProcess}
       .join("\n");
 
     const hasResume = resumeText.trim().length > 0;
+    const resumeCount = hasResume ? 5 : 0;
+    const positionCount = 2;
+    const categoryCount = totalAiQuestions - resumeCount - positionCount;
 
-    const prompt = `You are an expert technical interviewer with 15+ years of experience at top tech companies. Your task is to generate exactly 20 high-quality interview questions for a candidate.
+    const prompt = `You are an expert technical interviewer with 15+ years of experience at top tech companies. Your task is to generate exactly ${totalAiQuestions} high-quality interview questions for a candidate.
 
 === TARGET JOB ===
 ${jobDescription}
@@ -196,10 +245,10 @@ ${hasResume ? resumeText.substring(0, 4000) : "No resume provided — generate r
 ${selectedTopics}
 
 === GENERATION RULES ===
-You MUST generate exactly 20 questions distributed as follows:
-1. SOURCE "resume": Generate exactly ${hasResume ? "5" : "0"} questions that directly reference specific items from the candidate's resume (their projects, technologies they listed, roles they held, or skills they mentioned). These should feel personalized and make the candidate reflect on their actual experience.
-2. SOURCE "category": Generate exactly ${hasResume ? "13" : "18"} questions distributed across the selected categories above, weighted toward what the JD emphasizes most. Each selected category must have at least 1 question.
-3. SOURCE "position": Generate exactly 2 questions that are highly specific to the job title/domain (e.g., for a web dev role: advanced React or API design questions; for a data role: ML pipelines or data modeling).
+You MUST generate exactly ${totalAiQuestions} questions distributed as follows:
+1. SOURCE "resume": Generate exactly ${resumeCount} questions that directly reference specific items from the candidate's resume (their projects, technologies they listed, roles they held, or skills they mentioned). These should feel personalized and make the candidate reflect on their actual experience.
+2. SOURCE "category": Generate exactly ${categoryCount} questions distributed across the selected categories above, weighted toward what the JD emphasizes most. Each selected category must have at least 1 question.
+3. SOURCE "position": Generate exactly ${positionCount} questions that are highly specific to the job title/domain (e.g., for a web dev role: advanced React or API design questions; for a data role: ML pipelines or data modeling).
 
 For difficulty:
 - 30% Easy (fundamentals, definitions)
@@ -243,7 +292,7 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
         let errMsg = errText;
         try {
           errMsg = JSON.parse(errText)?.error?.message || errText;
-        } catch {}
+        } catch { }
         throw new Error(`OpenRouter Error: ${errMsg}`);
       }
 
@@ -260,11 +309,30 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
       raw = raw.substring(first, last + 1);
 
       const parsed = JSON.parse(raw);
-      const questions: InterviewQuestion[] = parsed.questions || [];
+      let aiQuestions: InterviewQuestion[] = parsed.questions || [];
 
-      if (questions.length === 0) {
+      if (aiQuestions.length === 0) {
         throw new Error("AI returned no questions. Please try again.");
       }
+
+      // Add new non-resume questions to the global pool
+      const newPoolQuestions = aiQuestions.filter(q => q.source !== "resume");
+      if (newPoolQuestions.length > 0) {
+        const bankInserts = newPoolQuestions.map(q => ({
+          id: crypto.randomUUID(),
+          jobId: q.source === "position" ? jobId : null,
+          category: q.category,
+          question: q.question,
+          answer: q.answer,
+          difficulty: q.difficulty,
+          source: q.source,
+          createdAt: new Date()
+        }));
+        await db.insert(interviewQuestionBank).values(bankInserts);
+      }
+
+      // Combine AI questions with selected DB questions
+      const finalQuestions = [...aiQuestions, ...selectedDbQuestions];
 
       // ── 5. Save to DB ──────────────────────────────────────────────────────
       await db.insert(interviewSession).values({
@@ -272,11 +340,11 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
         userId,
         jobId,
         categories,
-        questions,
+        questions: finalQuestions,
         createdAt: new Date(),
       });
 
-      return { questions, fromCache: false };
+      return { questions: finalQuestions, fromCache: false };
     } catch (aiError: any) {
       console.error("AI generation failed:", aiError);
 
@@ -332,4 +400,30 @@ export async function getInterviewSessions() {
   } catch {
     return [];
   }
+}
+
+// Check rate limit quickly without triggering full generation
+export async function checkInterviewRateLimit() {
+  const session = await getTypedSession();
+  if (!session?.user?.id) return { error: "Not authenticated" };
+
+  const lastSession = await db
+    .select({ createdAt: interviewSession.createdAt })
+    .from(interviewSession)
+    .where(eq(interviewSession.userId, session.user.id))
+    .orderBy(desc(interviewSession.createdAt))
+    .limit(1);
+
+  if (lastSession.length > 0) {
+    const lastGenerationTime = new Date(lastSession[0].createdAt).getTime();
+    const now = new Date().getTime();
+    const diffMinutes = (now - lastGenerationTime) / (1000 * 60);
+
+    if (diffMinutes < 15) {
+      const remaining = Math.ceil(15 - diffMinutes);
+      return { error: `Please wait ${remaining} minute${remaining > 1 ? 's' : ''} before generating new questions to prevent AI rate limiting.` };
+    }
+  }
+  
+  return { ok: true };
 }
