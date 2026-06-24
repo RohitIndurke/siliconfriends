@@ -5,16 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import { parseResumeAndCompare, getRecentResumes, deleteRecentResume } from '@/app/actions/resume';
 import { toast } from "sonner";
 
-const markdownComponents = {
-  p: ({ children }: any) => <span className="inline">{children}</span>,
-  a: ({ href, children }: any) => <a href={href} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{children}</a>,
-  strong: ({ children }: any) => <strong className="font-semibold text-gray-900">{children}</strong>,
-  ul: ({ children }: any) => <ul className="list-disc pl-5 my-1 space-y-1 block w-full">{children}</ul>,
-  ol: ({ children }: any) => <ol className="list-decimal pl-5 my-1 space-y-1 block w-full">{children}</ol>,
-  li: ({ children }: any) => <li>{children}</li>,
-};
-
-// Mock data for the selected job
 const MOCK_JOB_REQUIREMENTS = [
   "Strong proficiency in React and Next.js",
   "Experience with TypeScript and modern JavaScript",
@@ -59,15 +49,54 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const [resumeData, setResumeData] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
-    socials: "",
+    phone: "+1-555-123-4567",
+    location: "San Francisco, CA",
+    socials: "github.com/johndoe, linkedin.com/in/johndoe",
     categorizedSkills: {
-      technical: ["React", "JavaScript", "HTML", "CSS"],
-      tools: ["Git", "Webpack"],
-      soft: ["Teamwork", "Agile"]
+      languages: ["JavaScript", "TypeScript"],
+      frontend: ["React", "Next.js", "Tailwind CSS"],
+      backend: ["Node.js"],
+      databases: ["MongoDB", "PostgreSQL"],
+      tools: ["Git", "Docker"]
     },
-    tailoredExperience: "Frontend Developer at TechCorp (2 years)\n- Built responsive UIs [Insert Metric]\n- Improved performance by 20%",
-    education: "B.S. in Computer Science, University of Tech (2018-2022)",
-    certifications: "AWS Certified Developer - Associate",
+    experience: [
+      {
+        title: "Frontend Developer",
+        company: "TechCorp",
+        duration: "2021 - Present",
+        description: ["Built responsive UIs improving load time by 20%", "Collaborated with agile teams"]
+      }
+    ],
+    projects: [
+      {
+        name: "Portfolio Website",
+        duration: "2023",
+        techStack: "Next.js, Tailwind",
+        description: ["Developed personal portfolio with server components"]
+      }
+    ],
+    education: [
+      {
+        institution: "University of Tech",
+        degree: "B.S. in Computer Science",
+        duration: "2018 - 2022",
+        score: "GPA: 3.8/4.0"
+      },
+      {
+        institution: "Tech High School",
+        degree: "Higher Secondary Certificate",
+        duration: "2016 - 2018",
+        score: "92%"
+      }
+    ],
+    certifications: [
+      {
+        name: "AWS Certified Developer - Associate",
+        issuer: "Amazon Web Services"
+      }
+    ],
+    activities: ["Hackathon Winner 2022"],
+    interests: ["Artificial Intelligence", "Open Source"],
     executiveSummary: "Detail-oriented software engineer with expertise in frontend paradigms. Proven track record in agile team environments building responsive applications.",
   });
   const [missingGapAnalysis, setMissingGapAnalysis] = useState<string[]>([]);
@@ -123,15 +152,22 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       setResumeData({
         name: result.name || "",
         email: result.email || "",
+        phone: result.phone || "",
+        location: result.location || "",
         socials: Array.isArray(result.socials) ? result.socials.join(', ') : (typeof result.socials === 'string' ? result.socials : ""),
-        education: result.education || "",
-        certifications: result.certifications || "",
+        education: Array.isArray(result.education) ? result.education : [],
+        certifications: Array.isArray(result.certifications) ? result.certifications : [],
+        projects: Array.isArray(result.projects) ? result.projects : [],
+        experience: Array.isArray(result.experience) ? result.experience : [],
+        activities: Array.isArray(result.activities) ? result.activities : [],
+        interests: Array.isArray(result.interests) ? result.interests : [],
         executiveSummary: result.executiveSummary || "",
-        tailoredExperience: result.tailoredExperience || "",
         categorizedSkills: {
-          technical: Array.isArray(result.categorizedSkills?.technical) ? result.categorizedSkills.technical : [],
+          languages: Array.isArray(result.categorizedSkills?.languages) ? result.categorizedSkills.languages : [],
+          frontend: Array.isArray(result.categorizedSkills?.frontend) ? result.categorizedSkills.frontend : [],
+          backend: Array.isArray(result.categorizedSkills?.backend) ? result.categorizedSkills.backend : [],
+          databases: Array.isArray(result.categorizedSkills?.databases) ? result.categorizedSkills.databases : [],
           tools: Array.isArray(result.categorizedSkills?.tools) ? result.categorizedSkills.tools : [],
-          soft: Array.isArray(result.categorizedSkills?.soft) ? result.categorizedSkills.soft : [],
         },
       });
 
@@ -175,15 +211,22 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       setResumeData({
         name: result.name || "",
         email: result.email || "",
+        phone: result.phone || "",
+        location: result.location || "",
         socials: Array.isArray(result.socials) ? result.socials.join(', ') : (typeof result.socials === 'string' ? result.socials : ""),
-        education: result.education || "",
-        certifications: result.certifications || "",
+        education: Array.isArray(result.education) ? result.education : [],
+        certifications: Array.isArray(result.certifications) ? result.certifications : [],
+        projects: Array.isArray(result.projects) ? result.projects : [],
+        experience: Array.isArray(result.experience) ? result.experience : [],
+        activities: Array.isArray(result.activities) ? result.activities : [],
+        interests: Array.isArray(result.interests) ? result.interests : [],
         executiveSummary: result.executiveSummary || "",
-        tailoredExperience: result.tailoredExperience || "",
         categorizedSkills: {
-          technical: Array.isArray(result.categorizedSkills?.technical) ? result.categorizedSkills.technical : [],
+          languages: Array.isArray(result.categorizedSkills?.languages) ? result.categorizedSkills.languages : [],
+          frontend: Array.isArray(result.categorizedSkills?.frontend) ? result.categorizedSkills.frontend : [],
+          backend: Array.isArray(result.categorizedSkills?.backend) ? result.categorizedSkills.backend : [],
+          databases: Array.isArray(result.categorizedSkills?.databases) ? result.categorizedSkills.databases : [],
           tools: Array.isArray(result.categorizedSkills?.tools) ? result.categorizedSkills.tools : [],
-          soft: Array.isArray(result.categorizedSkills?.soft) ? result.categorizedSkills.soft : [],
         },
       });
 
@@ -201,7 +244,6 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   };
 
   const handleDeleteRecentResume = async (resumeId: string) => {
-    // Optimistic update
     setRecentResumes(prev => prev.filter(r => r.id !== resumeId));
     setConfirmDeleteId(null);
     toast.success("Resume deleted successfully");
@@ -225,19 +267,35 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
-      const { pdf, Document, Page, Text, View, StyleSheet } = await import('@react-pdf/renderer');
+      const { pdf, Document, Page, Text, View, StyleSheet, Font } = await import('@react-pdf/renderer');
 
       const styles = StyleSheet.create({
-        page: { padding: 40, fontFamily: 'Helvetica', fontSize: 11, color: '#111827' },
-        header: { marginBottom: 20, textAlign: 'center', borderBottom: '1pt solid #111827', paddingBottom: 15 },
-        name: { fontSize: 24, fontWeight: 'bold', textTransform: 'uppercase', marginBottom: 5 },
-        contact: { fontSize: 10, color: '#4b5563', flexDirection: 'row', justifyContent: 'center', gap: 10, flexWrap: 'wrap' },
-        section: { marginBottom: 15 },
-        sectionTitle: { fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1pt solid #d1d5db', marginBottom: 8, paddingBottom: 2 },
-        text: { fontSize: 10, lineHeight: 1.5 },
-        skillRow: { flexDirection: 'row', marginBottom: 4 },
-        skillCategory: { width: 120, fontSize: 10, fontWeight: 'bold' },
-        skillList: { flex: 1, fontSize: 10 }
+        page: { paddingHorizontal: 40, paddingVertical: 40, fontFamily: 'Helvetica', fontSize: 10, color: '#111827' },
+        header: { textAlign: 'center', marginBottom: 15 },
+        name: { fontSize: 20, fontWeight: 'bold', color: '#1e3a8a', textTransform: 'uppercase', marginBottom: 5 },
+        contact: { fontSize: 9, color: '#4b5563', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' },
+        contactItem: { marginHorizontal: 4 },
+        section: { marginBottom: 12 },
+        sectionTitle: { 
+          fontSize: 11, 
+          fontWeight: 'bold', 
+          color: '#1e3a8a', 
+          textTransform: 'uppercase', 
+          borderBottom: '1pt solid #bfdbfe', 
+          marginBottom: 6, 
+          paddingBottom: 2 
+        },
+        row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 },
+        itemTitle: { fontSize: 10, color: '#1e3a8a' },
+        itemSubtitle: { fontSize: 9, color: '#374151' },
+        dateText: { fontSize: 9, color: '#6b7280' },
+        text: { fontSize: 9, lineHeight: 1.4, color: '#374151' },
+        bulletRow: { flexDirection: 'row', marginBottom: 2 },
+        bulletPoint: { width: 10, fontSize: 9, color: '#374151' },
+        bulletContent: { flex: 1, fontSize: 9, lineHeight: 1.4, color: '#374151' },
+        skillRow: { flexDirection: 'row', marginBottom: 3 },
+        skillCategory: { width: 90, fontSize: 9, fontWeight: 'bold', color: '#111827' },
+        skillList: { flex: 1, fontSize: 9, color: '#374151' }
       });
 
       const doc = (
@@ -246,50 +304,126 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             <View style={styles.header}>
               <Text style={styles.name}>{resumeData.name}</Text>
               <View style={styles.contact}>
-                {resumeData.email ? <Text>{resumeData.email}</Text> : null}
-                {resumeData.socials.split(',').map(s => s.trim()).filter(Boolean).map((social, i) => (
-                  <Text key={i}>{social}</Text>
-                ))}
+                {resumeData.location && <Text style={styles.contactItem}>{resumeData.location}</Text>}
+                {resumeData.location && (resumeData.email || resumeData.phone) && <Text>|</Text>}
+                {resumeData.email && <Text style={styles.contactItem}>{resumeData.email}</Text>}
+                {resumeData.email && resumeData.phone && <Text>|</Text>}
+                {resumeData.phone && <Text style={styles.contactItem}>{resumeData.phone}</Text>}
+                {resumeData.socials && <Text>|</Text>}
+                {resumeData.socials && <Text style={styles.contactItem}>{resumeData.socials}</Text>}
               </View>
             </View>
 
             {resumeData.executiveSummary ? (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Professional Summary</Text>
+                <Text style={styles.sectionTitle}>Profile Summary</Text>
                 <Text style={styles.text}>{resumeData.executiveSummary}</Text>
               </View>
             ) : null}
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Skills & Technologies</Text>
+              <Text style={styles.sectionTitle}>Technical Skills</Text>
               {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => skills.length > 0 ? (
                 <View key={category} style={styles.skillRow}>
                   <Text style={styles.skillCategory}>
-                    {category === 'technical' ? 'Technical Skills:' : category === 'tools' ? 'Tools & Frameworks:' : 'Soft Skills:'}
+                    {category.charAt(0).toUpperCase() + category.slice(1)}:
                   </Text>
                   <Text style={styles.skillList}>{(skills as string[]).join(', ')}</Text>
                 </View>
               ) : null)}
             </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Professional Experience</Text>
-              <Text style={styles.text}>{resumeData.tailoredExperience}</Text>
-            </View>
+            {resumeData.experience && resumeData.experience.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Professional Experience</Text>
+                {resumeData.experience.map((exp: any, i: number) => (
+                  <View key={i} style={{ marginBottom: 6 }}>
+                    <View style={styles.row}>
+                      <Text style={styles.itemTitle}>{exp.title}</Text>
+                      <Text style={styles.dateText}>{exp.duration}</Text>
+                    </View>
+                    <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>{exp.company}</Text>
+                    {exp.description && exp.description.map((bullet: string, j: number) => (
+                      <View key={j} style={styles.bulletRow}>
+                        <Text style={styles.bulletPoint}>•</Text>
+                        <Text style={styles.bulletContent}>{bullet}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
 
-            {resumeData.education ? (
+            {resumeData.projects && resumeData.projects.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Projects</Text>
+                {resumeData.projects.map((proj: any, i: number) => (
+                  <View key={i} style={{ marginBottom: 6 }}>
+                    <View style={styles.row}>
+                      <Text style={styles.itemTitle}>{proj.name}</Text>
+                      <Text style={styles.dateText}>{proj.duration}</Text>
+                    </View>
+                    {proj.techStack && <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>Tech Stack: {proj.techStack}</Text>}
+                    {proj.description && proj.description.map((bullet: string, j: number) => (
+                      <View key={j} style={styles.bulletRow}>
+                        <Text style={styles.bulletPoint}>•</Text>
+                        <Text style={styles.bulletContent}>{bullet}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {resumeData.education && resumeData.education.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Education</Text>
-                <Text style={styles.text}>{resumeData.education}</Text>
+                {resumeData.education.map((edu: any, i: number) => (
+                  <View key={i} style={{ marginBottom: 6 }}>
+                    <View style={styles.row}>
+                      <Text style={[styles.itemTitle, { color: '#111827' }]}>{edu.institution}</Text>
+                      <Text style={styles.dateText}>{edu.duration}</Text>
+                    </View>
+                    <Text style={styles.text}>{edu.degree} {edu.score ? `| ${edu.score}` : ''}</Text>
+                  </View>
+                ))}
               </View>
-            ) : null}
+            )}
 
-            {resumeData.certifications ? (
+            {resumeData.certifications && resumeData.certifications.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Certifications & Licenses</Text>
-                <Text style={styles.text}>{resumeData.certifications}</Text>
+                {resumeData.certifications.map((cert: any, i: number) => (
+                  <View key={i} style={styles.bulletRow}>
+                    <Text style={styles.bulletPoint}>•</Text>
+                    <Text style={styles.bulletContent}>
+                      <Text style={{ fontWeight: 'bold', color: '#1e3a8a' }}>{cert.name}</Text> 
+                      {cert.issuer ? ` – ${cert.issuer}` : ''}
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ) : null}
+            )}
+
+            {resumeData.activities && resumeData.activities.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Activities, Leadership & Achievements</Text>
+                {resumeData.activities.map((act: string, i: number) => (
+                  <View key={i} style={styles.bulletRow}>
+                    <Text style={styles.bulletPoint}>•</Text>
+                    <Text style={styles.bulletContent}>{act}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {resumeData.interests && resumeData.interests.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Interests</Text>
+                <Text style={styles.text}>{resumeData.interests.join(', ')}</Text>
+              </View>
+            )}
+
           </Page>
         </Document>
       );
@@ -518,7 +652,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Left: ATS Analysis */}
-                <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-6 h-fit sticky top-6">
                   <div className="flex items-center gap-2 mb-4">
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#d97706">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -573,7 +707,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Full Name</label>
                         <input
@@ -593,6 +727,24 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                         />
                       </div>
                       <div>
+                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Phone</label>
+                        <input
+                          type="text"
+                          value={resumeData.phone}
+                          onChange={e => setResumeData({ ...resumeData, phone: e.target.value })}
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Location</label>
+                        <input
+                          type="text"
+                          value={resumeData.location}
+                          onChange={e => setResumeData({ ...resumeData, location: e.target.value })}
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
                         <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Social Links</label>
                         <input
                           type="text"
@@ -605,7 +757,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Executive Summary</label>
+                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Profile Summary</label>
                       <textarea
                         value={resumeData.executiveSummary}
                         onChange={e => setResumeData({ ...resumeData, executiveSummary: e.target.value })}
@@ -617,10 +769,10 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                       {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => (
                         <div key={category}>
                           <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
-                            {category === 'technical' ? 'Technical Skills' : category === 'tools' ? 'Tools & Frameworks' : 'Soft Skills'}
+                            {category} Skills
                           </label>
                           <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md bg-white min-h-[40px] items-start">
-                            {skills.map((skill: string, i: number) => (
+                            {Array.isArray(skills) && skills.map((skill: string, i: number) => (
                               <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
                                 {skill}
                                 <button
@@ -656,33 +808,39 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                       ))}
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Tailored Experience (Action + Metric)</label>
-                      <textarea
-                        value={resumeData.tailoredExperience}
-                        onChange={e => setResumeData({ ...resumeData, tailoredExperience: e.target.value })}
-                        className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none h-32 resize-none"
-                      />
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 mb-3">Note: For structured sections below (Experience, Projects, Education, Certifications), direct editing is available via raw JSON in advanced mode or just continue to preview.</p>
+                      
+                      {/* Advanced JSON Editor for deeply nested structures */}
+                      <details className="cursor-pointer group">
+                        <summary className="text-sm font-bold text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1">
+                          Edit Advanced Structures (JSON)
+                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="group-open:rotate-180 transition-transform">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </summary>
+                        <textarea
+                          value={JSON.stringify({
+                            experience: resumeData.experience,
+                            projects: resumeData.projects,
+                            education: resumeData.education,
+                            certifications: resumeData.certifications,
+                            activities: resumeData.activities,
+                            interests: resumeData.interests
+                          }, null, 2)}
+                          onChange={e => {
+                            try {
+                              const parsed = JSON.parse(e.target.value);
+                              setResumeData({ ...resumeData, ...parsed });
+                            } catch (err) {
+                              // Invalid JSON, don't update state
+                            }
+                          }}
+                          className="w-full border border-gray-300 rounded-md p-3 text-xs font-mono text-gray-800 bg-gray-50 focus:border-blue-500 focus:outline-none h-96 resize-y mt-2"
+                        />
+                      </details>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Education</label>
-                        <textarea
-                          value={resumeData.education}
-                          onChange={e => setResumeData({ ...resumeData, education: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none h-24 resize-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Certifications & Licenses</label>
-                        <textarea
-                          value={resumeData.certifications}
-                          onChange={e => setResumeData({ ...resumeData, certifications: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none h-24 resize-none"
-                        />
-                      </div>
-                    </div>
                   </div>
 
                   <div className="mt-8 flex justify-end">
@@ -752,72 +910,142 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             </div>
           </div>
 
-          {/* Resume Preview Document (Mock) */}
-          <div id="resume-preview-document" className="bg-white rounded-sm shadow-lg border border-gray-200 p-8 sm:p-12 min-h-[600px] font-serif">
-            <div className="text-center border-b-2 border-gray-800 pb-6 mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 uppercase tracking-wide">{resumeData.name}</h1>
-              <p className="text-sm text-gray-600 flex items-center justify-center gap-4 flex-wrap mt-1">
+          {/* Resume Preview Document (Mock - Matches PDF visually) */}
+          <div id="resume-preview-document" className="bg-white rounded-sm shadow-xl border border-gray-200 p-8 sm:p-14 min-h-[800px] font-sans text-gray-800 leading-snug">
+            
+            <div className="text-center mb-6">
+              <h1 className="text-[26px] font-bold text-[#1e3a8a] uppercase tracking-wide mb-1.5">{resumeData.name}</h1>
+              <div className="text-[12px] text-gray-600 flex flex-wrap justify-center items-center gap-x-2 gap-y-1">
+                {resumeData.location && <span>{resumeData.location}</span>}
+                {resumeData.location && (resumeData.email || resumeData.phone) && <span>|</span>}
                 {resumeData.email && <span>{resumeData.email}</span>}
-                {resumeData.socials.split(',').map(s => s.trim()).filter(Boolean).map((social, i) => (
-                  <React.Fragment key={i}>
-                    {(i > 0 || resumeData.email) && <span>•</span>}
-                    <a href={social.startsWith('http') ? social : `https://${social}`} target="_blank" rel="noreferrer" className="hover:text-blue-600 transition-colors">
-                      {social}
-                    </a>
-                  </React.Fragment>
-                ))}
-              </p>
+                {resumeData.email && resumeData.phone && <span>|</span>}
+                {resumeData.phone && <span>{resumeData.phone}</span>}
+                {resumeData.socials && <span>|</span>}
+                {resumeData.socials && <span>{resumeData.socials}</span>}
+              </div>
             </div>
 
             {resumeData.executiveSummary && (
-              <div className="mb-6">
-                <h2 className="text-lg font-bold text-gray-800 uppercase border-b border-gray-300 mb-3 pb-1">Professional Summary</h2>
-                <p className="text-sm text-gray-700 leading-relaxed">
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Profile Summary</h2>
+                <p className="text-[12px] text-gray-800 leading-relaxed">
                   {resumeData.executiveSummary}
                 </p>
               </div>
             )}
 
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-800 uppercase border-b border-gray-300 mb-3 pb-1">Skills & Technologies</h2>
-              <div className="space-y-3 mt-2">
+            <div className="mb-5">
+              <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Technical Skills</h2>
+              <div className="space-y-1 mt-1 text-[12px]">
                 {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => skills.length > 0 && (
-                  <div key={category} className="flex items-start gap-2">
-                    <span className="text-sm font-bold text-gray-700 min-w-[140px] pt-1">
-                      {category === 'technical' ? 'Technical Skills:' : category === 'tools' ? 'Tools & Frameworks:' : 'Soft Skills:'}
+                  <div key={category} className="flex items-start gap-1">
+                    <span className="font-bold text-gray-900 min-w-[90px] capitalize">
+                      {category}:
                     </span>
-                    <div className="flex flex-wrap text-sm text-gray-700 pt-1">
+                    <span className="text-gray-800">
                       {skills.join(', ')}
-                    </div>
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-800 uppercase border-b border-gray-300 mb-3 pb-1">Professional Experience</h2>
-              <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                {resumeData.tailoredExperience}
-              </div>
-            </div>
-
-            {resumeData.education && (
-              <div className="mb-6">
-                <h2 className="text-lg font-bold text-gray-800 uppercase border-b border-gray-300 mb-3 pb-1">Education</h2>
-                <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                  {resumeData.education}
+            {resumeData.experience && resumeData.experience.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Professional Experience</h2>
+                <div className="space-y-3">
+                  {resumeData.experience.map((exp: any, i: number) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-0.5">
+                        <span className="text-[13px] font-bold text-[#1e3a8a]">{exp.title}</span>
+                        <span className="text-[11px] text-gray-600">{exp.duration}</span>
+                      </div>
+                      <div className="text-[12px] italic text-gray-700 mb-1">{exp.company}</div>
+                      <ul className="list-disc pl-4 space-y-0.5">
+                        {exp.description && exp.description.map((bullet: string, j: number) => (
+                          <li key={j} className="text-[12px] text-gray-800">{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {resumeData.certifications && (
-              <div>
-                <h2 className="text-lg font-bold text-gray-800 uppercase border-b border-gray-300 mb-3 pb-1">Certifications & Licenses</h2>
-                <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                  {resumeData.certifications}
+            {resumeData.projects && resumeData.projects.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Projects</h2>
+                <div className="space-y-3">
+                  {resumeData.projects.map((proj: any, i: number) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-0.5">
+                        <span className="text-[13px] font-bold text-[#1e3a8a]">{proj.name}</span>
+                        <span className="text-[11px] text-gray-600">{proj.duration}</span>
+                      </div>
+                      {proj.techStack && <div className="text-[12px] italic text-gray-700 mb-1">Tech Stack: {proj.techStack}</div>}
+                      <ul className="list-disc pl-4 space-y-0.5">
+                        {proj.description && proj.description.map((bullet: string, j: number) => (
+                          <li key={j} className="text-[12px] text-gray-800">{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
+
+            {resumeData.education && resumeData.education.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Education</h2>
+                <div className="space-y-3">
+                  {resumeData.education.map((edu: any, i: number) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-0.5">
+                        <span className="text-[13px] font-bold text-gray-900">{edu.institution}</span>
+                        <span className="text-[11px] text-gray-600">{edu.duration}</span>
+                      </div>
+                      <div className="text-[12px] text-gray-800">{edu.degree} {edu.score ? `| ${edu.score}` : ''}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {resumeData.certifications && resumeData.certifications.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Certifications & Licenses</h2>
+                <ul className="list-disc pl-4 space-y-0.5">
+                  {resumeData.certifications.map((cert: any, i: number) => (
+                    <li key={i} className="text-[12px] text-gray-800">
+                      <span className="font-bold text-[#1e3a8a]">{cert.name}</span>
+                      {cert.issuer ? ` – ${cert.issuer}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {resumeData.activities && resumeData.activities.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Activities, Leadership & Achievements</h2>
+                <ul className="list-disc pl-4 space-y-0.5">
+                  {resumeData.activities.map((act: string, i: number) => (
+                    <li key={i} className="text-[12px] text-gray-800">{act}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {resumeData.interests && resumeData.interests.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Interests</h2>
+                <div className="text-[12px] text-gray-800">
+                  {resumeData.interests.join(', ')}
+                </div>
+              </div>
+            )}
+            
           </div>
         </div>
       )}
