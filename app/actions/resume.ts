@@ -159,23 +159,63 @@ Respond ONLY with a valid JSON object in the exact format below, with no markdow
 {
   "name": "Extracted full name",
   "email": "Extracted email address",
+  "phone": "Extracted phone number or empty",
+  "location": "Extracted location (City, State) or empty",
   "socials": "Extracted social URLs like LinkedIn, GitHub, Portfolio (comma separated, or empty if none)",
-  "education": "Extracted education details (bullet points)",
-  "certifications": "Extracted certifications and licenses (bullet points, or empty if none)",
+  "education": [
+    {
+      "institution": "Highest Degree Institution (e.g., University Name)",
+      "degree": "Degree Name (e.g., B.Sc. Computer Science)",
+      "duration": "YYYY - YYYY",
+      "score": "CGPA/Percentage if available, else empty"
+    },
+    {
+      "institution": "Previous Institution (e.g., High School/Junior College)",
+      "degree": "HSC / SSC / Diploma",
+      "duration": "YYYY",
+      "score": "CGPA/Percentage if available"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Certification Name",
+      "issuer": "Issuing Organization"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Project Name",
+      "duration": "YYYY",
+      "techStack": "Technologies used",
+      "description": ["Bullet point 1", "Bullet point 2"]
+    }
+  ],
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "duration": "YYYY - YYYY",
+      "description": ["Bullet point 1", "Bullet point 2"]
+    }
+  ],
   "atsKeywordSummary": ["Keyword 1", "Keyword 2", "... up to 10"],
   "executiveSummary": "Professional Summary incorporating keywords (Max 4 lines).",
-  "tailoredExperience": "Professional Experience: Optimized bullet points following the Action + Metric rule.",
   "categorizedSkills": {
-    "technical": ["skill 1", "skill 2"],
-    "tools": ["tool 1", "tool 2"],
-    "soft": ["soft skill 1"]
+    "languages": ["lang1"],
+    "frontend": ["f1"],
+    "backend": ["b1"],
+    "databases": ["d1"],
+    "tools": ["t1"]
   },
+  "activities": ["Activity or Achievement 1", "Activity 2"],
+  "interests": ["Interest 1", "Interest 2"],
   "missingGapAnalysis": ["Missing High-Priority Skill 1", "Missing High-Priority Skill 2"]
 }
 
 Constraints:
 NEVER use tables, columns, or graphical icons (these break ATS parsers).
-If a metric is missing from the user's input, use the placeholder [Quantifiable Metric] and instruct the user to replace it.
+NEVER use the placeholder [Quantifiable Metric]. Instead, infer a realistic quantifiable metric from context or write a strong, general impact statement.
+Ensure you extract ALL education history provided in the resume (including SSC, HSC, Diplomas, Bachelor's, Master's, PhD) as separate objects in the education array.
 Ensure the tone is authoritative and result-oriented.
 Do not invent experience. If the user doesn't have a skill, identify the gap, do not fabricate it.
 
