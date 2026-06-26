@@ -18,6 +18,9 @@ export type GenerateInterviewResult =
   | { questions: InterviewQuestion[]; fromCache: boolean }
   | { error: string; questions?: InterviewQuestion[]; fromCache?: boolean };
 
+// Cooldown period (in minutes) required before generating new interview questions
+const RATE_LIMIT_MINUTES = 15;
+
 const CATEGORY_TOPICS: Record<string, string> = {
   "Coding / DSA":
     "Arrays, Strings, Linked Lists, Trees, Graphs, Dynamic Programming, Sorting & Searching, Coding round problems",
@@ -98,8 +101,8 @@ export async function generateInterviewQuestions(
       const now = new Date().getTime();
       const diffMinutes = (now - lastGenerationTime) / (1000 * 60);
 
-      if (diffMinutes < 1) {
-        const remaining = Math.ceil(1 - diffMinutes);
+      if (diffMinutes < RATE_LIMIT_MINUTES) {
+        const remaining = Math.ceil(RATE_LIMIT_MINUTES - diffMinutes);
         return { error: `Please wait ${remaining} minute${remaining > 1 ? 's' : ''} before generating new questions to prevent AI rate limiting.` };
       }
     }
@@ -419,11 +422,11 @@ export async function checkInterviewRateLimit() {
     const now = new Date().getTime();
     const diffMinutes = (now - lastGenerationTime) / (1000 * 60);
 
-    if (diffMinutes < 15) {
-      const remaining = Math.ceil(15 - diffMinutes);
+    if (diffMinutes < RATE_LIMIT_MINUTES) {
+      const remaining = Math.ceil(RATE_LIMIT_MINUTES - diffMinutes);
       return { error: `Please wait ${remaining} minute${remaining > 1 ? 's' : ''} before generating new questions to prevent AI rate limiting.` };
     }
   }
-  
+
   return { ok: true };
 }
