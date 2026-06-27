@@ -146,6 +146,7 @@ Extract the top 10 "hard skills," "tools," and "industry-specific keywords" from
 Identify the 3 most important "Job Requirements" (the core responsibilities the employer values most).
 
 Phase 2: Semantic Rewriting (Mandatory Constraints)
+Strict Name Preservation: Keep all Project Names, Company Names, Institutions, and Certification Titles EXACTLY as written in the uploaded resume. Never change or rename them.
 Action + Metric: Every bullet point in the "Experience" section must follow this format: [Power Verb] + [The Task] + [The Result/Metric].
 Example: "Engineered a scalable dashboard using Next.js, reducing load times by 40% and improving user retention."
 Keyword Weaving: Naturally incorporate the keywords extracted in Phase 1 into the "Professional Summary" and "Experience" bullet points. Do not "stuff" keywords—they must sound professional and contextually relevant.
@@ -215,6 +216,7 @@ Respond ONLY with a valid JSON object in the exact format below, with no markdow
 Constraints:
 NEVER use tables, columns, or graphical icons (these break ATS parsers).
 NEVER use the placeholder [Quantifiable Metric]. Instead, infer a realistic quantifiable metric from context or write a strong, general impact statement.
+PRESERVE ORIGINAL NAMES EXACTLY: You MUST keep the exact original Project Names, Company Names, Job Titles, Institutions, and Certification Titles exactly as written in the candidate's original resume. Do NOT rename, rephrase, embellish, or invent new project names or company names under any circumstances. Only optimize the bullet point descriptions.
 Ensure you extract ALL education history provided in the resume (including SSC, HSC, Diplomas, Bachelor's, Master's, PhD) as separate objects in the education array.
 Ensure the tone is authoritative and result-oriented.
 Do not invent experience. If the user doesn't have a skill, identify the gap, do not fabricate it.

@@ -8,7 +8,12 @@ export const user = sqliteTable("user", {
   image: text("image"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
-  role: text("role").notNull().default("student")
+  role: text("role").notNull().default("student"),
+  rollNumber: text("rollNumber"),
+  department: text("department"),
+  cgpa: real("cgpa"),
+  skills: text("skills", { mode: "json" }).$type<string[]>(),
+  placementStatus: text("placementStatus").default("Active")
 });
 
 export const session = sqliteTable("session", {
@@ -129,4 +134,13 @@ export const interviewQuestionBank = sqliteTable("interviewQuestionBank", {
   difficulty: text("difficulty").notNull(),
   source: text("source").notNull(), // "category" or "position"
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
+
+export const jobApplication = sqliteTable("jobApplication", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id),
+  jobId: text("jobId").notNull().references(() => job.id),
+  status: text("status").notNull().default("Applied"), // "Applied", "Shortlisted", "Interview", "Selected", "Rejected"
+  appliedAt: integer("appliedAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull()
 });

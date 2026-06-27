@@ -133,3 +133,22 @@ export const POPULAR_TAGS = [
   "Advertising / Events",
   "Communication Skills",
 ];
+
+export const DEPARTMENTS = [
+  "B.Sc. - Cyber & Digital Science",
+  "B.Sc. - Animation",
+  "B.Sc. - Computer Science",
+  "M.Com. - Commerce",
+  "B.Com. - Commerce",
+  "B.B.A. - International Business",
+  "B.B.A. - Business Administration",
+  "M.Sc. - Computer Application",
+  "B.C.A. - Science",
+  "B.B.A. - Computer Applications",
+  "B.Sc. - Information Technology",
+  "M.Sc. - Cyber Security",
+  "B.Sc. - Artificial Intelligence & Machine Learning",
+  "B.Sc. - Data Science",
+  "M.Sc. - Industrial Mathematics with Computer Applications",
+  "M.Sc. - Computer Science",
+];
