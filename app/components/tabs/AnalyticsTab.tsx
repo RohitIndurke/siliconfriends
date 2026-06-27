@@ -4,13 +4,35 @@ export default function AnalyticsTab({ data }: { data?: any }) {
   const placedStudents = data?.placedStudents ?? 0;
   const totalStudents = data?.totalStudents ?? 0;
   const placementRate = totalStudents > 0 ? Math.round((placedStudents / totalStudents) * 100) : 0;
+  const highestPackage = data?.highestPackage ?? "35 LPA";
+  const highestPackageDetail = data?.highestPackageDetail ?? "Google — SE L3";
+  const avgPackage = data?.avgPackage ?? "18.2 LPA";
+  const avgPackageDetail = data?.avgPackageDetail ?? "Across all companies";
+
+  const companyPlacements = data?.companyPlacements ?? [
+    { label: 'Amazon', value: 15 },
+    { label: 'Google', value: 12 },
+    { label: 'Microsoft', value: 9 },
+    { label: 'Flipkart', value: 7 },
+    { label: 'Deloitte', value: 8 },
+    { label: 'Infosys', value: 18 },
+  ];
+  const maxCompanyVal = data?.maxCompanyVal ?? 20;
+
+  const departmentDistribution = data?.departmentDistribution ?? [
+    { name: 'B.Sc. CS', count: 32, color: 'bg-blue-600', strokeColor: '#2563eb', strokeDasharray: '93 127', strokeDashoffset: 0 },
+    { name: 'B.C.A.', count: 24, color: 'bg-emerald-500', strokeColor: '#10b981', strokeDasharray: '48 172', strokeDashoffset: -95 },
+    { name: 'M.Sc. CS', count: 18, color: 'bg-amber-500', strokeColor: '#f59e0b', strokeDasharray: '32 188', strokeDashoffset: -145 },
+    { name: 'B.B.A.', count: 14, color: 'bg-violet-500', strokeColor: '#8b5cf6', strokeDasharray: '21 199', strokeDashoffset: -179 },
+    { name: 'Data Sci.', count: 9, color: 'bg-pink-500', strokeColor: '#ec4899', strokeDasharray: '16 204', strokeDashoffset: -202 },
+  ];
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300 pb-10">
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-gray-900">Analytics</h2>
-        <p className="text-sm text-gray-500 mt-1">Placement statistics — Academic Year 2023-24</p>
+        <p className="text-sm text-gray-500 mt-1">Real-time Placement Statistics & Insights</p>
       </div>
 
       {/* Stats Cards */}
@@ -50,10 +72,10 @@ export default function AnalyticsTab({ data }: { data?: any }) {
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Highest Package</p>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">35 LPA</p>
-            <p className="text-xs text-gray-500">Google — SE L3</p>
+            <p className="text-2xl font-bold text-gray-900 leading-none mb-1 truncate">{highestPackage}</p>
+            <p className="text-xs text-gray-500 truncate" title={highestPackageDetail}>{highestPackageDetail}</p>
           </div>
         </div>
 
@@ -64,10 +86,10 @@ export default function AnalyticsTab({ data }: { data?: any }) {
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Avg. Package</p>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">18.2 LPA</p>
-            <p className="text-xs text-gray-500">Across all companies</p>
+            <p className="text-2xl font-bold text-gray-900 leading-none mb-1 truncate">{avgPackage}</p>
+            <p className="text-xs text-gray-500 truncate" title={avgPackageDetail}>{avgPackageDetail}</p>
           </div>
         </div>
       </div>
@@ -79,11 +101,11 @@ export default function AnalyticsTab({ data }: { data?: any }) {
           <div className="overflow-x-auto">
             <div className="h-[220px] sm:h-[250px] flex items-end justify-between relative pl-8 pb-8 min-w-[280px]">
              {/* Y-Axis */}
-             <div className="absolute left-0 top-0 bottom-8 w-6 flex flex-col justify-between text-[10px] text-gray-400 font-mono text-right">
-                <span>20</span>
-                <span>15</span>
-                <span>10</span>
-                <span>5</span>
+             <div className="absolute left-0 top-0 bottom-8 w-8 flex flex-col justify-between text-[10px] text-gray-400 font-mono text-right pr-1">
+                <span>{maxCompanyVal}</span>
+                <span>{Math.round(maxCompanyVal * 0.75)}</span>
+                <span>{Math.round(maxCompanyVal * 0.5)}</span>
+                <span>{Math.round(maxCompanyVal * 0.25)}</span>
                 <span>0</span>
              </div>
              {/* Grid Lines */}
@@ -94,20 +116,13 @@ export default function AnalyticsTab({ data }: { data?: any }) {
              </div>
              
              {/* Bars */}
-             {[
-               { label: 'Amazon', value: 15 },
-               { label: 'Google', value: 12 },
-               { label: 'Microsoft', value: 9 },
-               { label: 'Flipkart', value: 7 },
-               { label: 'Deloitte', value: 8 },
-               { label: 'Infosys', value: 18 },
-             ].map((company, i) => (
+             {companyPlacements.map((company: any, i: number) => (
                 <div key={i} className="relative flex flex-col items-center w-8 sm:w-12 z-10 group cursor-pointer">
                    <div 
                       className="w-4 sm:w-6 bg-blue-600 rounded-t-sm transition-all group-hover:bg-blue-500" 
-                      style={{ height: `${(company.value / 20) * 100}%` }}
+                      style={{ height: `${Math.min(100, Math.max(8, (company.value / maxCompanyVal) * 100))}%` }}
                    ></div>
-                   <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">{company.label}</span>
+                   <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap truncate max-w-[60px]" title={company.label}>{company.label}</span>
                 </div>
              ))}
             </div>
@@ -121,32 +136,28 @@ export default function AnalyticsTab({ data }: { data?: any }) {
              <div className="relative w-48 h-48">
                 {/* CSS SVG Donut Chart */}
                 <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 drop-shadow-sm">
-                   {/* CS: 42 */}
-                   <circle cx="50" cy="50" r="35" fill="transparent" stroke="#2563eb" strokeWidth="25" strokeDasharray="93 127" strokeDashoffset="0" />
-                   {/* IT: 22 */}
-                   <circle cx="50" cy="50" r="35" fill="transparent" stroke="#10b981" strokeWidth="25" strokeDasharray="48 172" strokeDashoffset="-95" />
-                   {/* ECE: 15 */}
-                   <circle cx="50" cy="50" r="35" fill="transparent" stroke="#f59e0b" strokeWidth="25" strokeDasharray="32 188" strokeDashoffset="-145" />
-                   {/* Mech: 10 */}
-                   <circle cx="50" cy="50" r="35" fill="transparent" stroke="#8b5cf6" strokeWidth="25" strokeDasharray="21 199" strokeDashoffset="-179" />
-                   {/* Civil: 8 */}
-                   <circle cx="50" cy="50" r="35" fill="transparent" stroke="#ec4899" strokeWidth="25" strokeDasharray="16 204" strokeDashoffset="-202" />
+                   {departmentDistribution.map((dept: any, i: number) => (
+                     <circle 
+                       key={i}
+                       cx="50" 
+                       cy="50" 
+                       r="35" 
+                       fill="transparent" 
+                       stroke={dept.strokeColor} 
+                       strokeWidth="25" 
+                       strokeDasharray={dept.strokeDasharray} 
+                       strokeDashoffset={dept.strokeDashoffset} 
+                     />
+                   ))}
                 </svg>
-                {/* Inner White Cutout to ensure transparency hole is clean if needed, though fill="transparent" works */}
              </div>
              
              {/* Legend */}
              <div className="flex flex-col gap-3">
-                {[
-                  { name: 'B.Sc. CS', count: 32, color: 'bg-blue-600' },
-                  { name: 'B.C.A.', count: 24, color: 'bg-emerald-500' },
-                  { name: 'M.Sc. CS', count: 18, color: 'bg-amber-500' },
-                  { name: 'B.B.A.', count: 14, color: 'bg-violet-500' },
-                  { name: 'Data Sci.', count: 9, color: 'bg-pink-500' },
-                ].map((dept, i) => (
+                {departmentDistribution.map((dept: any, i: number) => (
                    <div key={i} className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${dept.color}`}></div>
-                      <span className="text-xs text-gray-600 w-20 truncate">{dept.name}</span>
+                      <span className="text-xs text-gray-600 w-24 truncate" title={dept.name}>{dept.name}</span>
                       <span className="text-xs font-mono font-bold text-gray-900 ml-auto">{dept.count}</span>
                    </div>
                 ))}
