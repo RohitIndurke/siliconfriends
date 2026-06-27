@@ -1,11 +1,10 @@
 "use client";
 
-import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <Toaster
         position="bottom-right"
         richColors
@@ -17,6 +16,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }}
       />
       {children}
-    </HeroUIProvider>
+    </>
   );
 }
