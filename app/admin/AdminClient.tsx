@@ -16,7 +16,7 @@ import AnalyticsTab from "../components/tabs/AnalyticsTab";
 
 const ADMIN_TABS = ["Dashboard", "Job Posting", "Analytics", "Students"] as const;
 
-export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
+export default function AdminClient({ initialJobs, dashboardData }: { initialJobs: any[]; dashboardData?: any }) {
   const { data: session } = useSession();
 
   const [activeTab, setActiveTab] = useState<string>("Dashboard");
@@ -132,9 +132,9 @@ export default function AdminClient({ initialJobs }: { initialJobs: any[] }) {
           </div>
         </div>
 
-        {activeTab === "Dashboard" && <DashboardTab />}
-        {activeTab === "Analytics" && <AnalyticsTab />}
-        {activeTab === "Students" && <StudentsTab onAddStudent={() => setIsAddStudentOpen(true)} />}
+        {activeTab === "Dashboard" && <DashboardTab data={dashboardData} />}
+        {activeTab === "Analytics" && <AnalyticsTab data={dashboardData} />}
+        {activeTab === "Students" && <StudentsTab students={dashboardData?.studentsList || []} onAddStudent={() => setIsAddStudentOpen(true)} />}
         
         {activeTab === "Job Posting" && (
           <div className="flex gap-6">

@@ -11,6 +11,7 @@ import { formatDistanceToNow } from "date-fns";
 import AiResumeBuilderTab from "../components/tabs/AiResumeBuilderTab";
 import AiInterviewPrepTab from "../components/tabs/AiInterviewPrepTab";
 import MyApplicationsTab from "../components/tabs/MyApplicationsTab";
+import { CompleteProfileModal } from "../components/CompleteProfileModal";
 
 const STUDENT_TABS = ["Opportunities", "My Application", "AI Resume Builder", "AI Interview Prep"] as const;
 
@@ -18,6 +19,9 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
   const { data: session } = useSession();
 
   const [activeTab, setActiveTab] = useState<string>("Opportunities");
+  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
+
+  const isProfileIncomplete = session && (!((session.user as any).cgpa) || !((session.user as any).department) || !((session.user as any).rollNumber) || !((session.user as any).skills?.length));
 
   const router = useRouter();
 
@@ -50,9 +54,19 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
             {session ? (
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
-                    {session.user.name.substring(0, 2)}
-                  </div>
+                  {isProfileIncomplete ? (
+                    <button
+                      onClick={() => setShowCompleteProfileModal(true)}
+                      title="Click to complete your profile"
+                      className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold border-2 border-amber-500 uppercase shrink-0 animate-pulse hover:bg-amber-200 transition-colors shadow-sm"
+                    >
+                      !
+                    </button>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
+                      {session.user.name.substring(0, 2)}
+                    </div>
+                  )}
                   <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[150px] truncate">
                     {session.user.name}
                   </span>
@@ -255,6 +269,17 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
         )}
       </main>
 
+      {showCompleteProfileModal && (
+        <CompleteProfileModal
+          initialData={{
+            rollNumber: (session?.user as any)?.rollNumber,
+            department: (session?.user as any)?.department,
+            cgpa: (session?.user as any)?.cgpa,
+            skills: (session?.user as any)?.skills,
+          }}
+          onClose={() => setShowCompleteProfileModal(false)}
+        />
+      )}
     </div>
   );
 }

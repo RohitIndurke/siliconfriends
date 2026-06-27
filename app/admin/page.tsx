@@ -4,9 +4,9 @@ import { desc } from "drizzle-orm";
 import AdminClient from "./AdminClient";
 import { getTypedSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { getAdminDashboardDataAction } from "@/actions/application";
 
 export default async function AdminPage() {
-  // S-04: Use typed session helper — no more (session.user as any).role
   const session = await getTypedSession();
 
   if (!session) {
@@ -18,5 +18,7 @@ export default async function AdminPage() {
   }
 
   const jobs = await db.select().from(job).orderBy(desc(job.createdAt));
-  return <AdminClient initialJobs={jobs} />;
+  const dashboardRes = await getAdminDashboardDataAction();
+
+  return <AdminClient initialJobs={jobs} dashboardData={dashboardRes.data || {}} />;
 }

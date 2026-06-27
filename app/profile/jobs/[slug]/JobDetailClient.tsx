@@ -5,6 +5,9 @@ import Image from "next/image";
 import { formatDistanceToNow, format } from "date-fns";
 import { useSession } from "@/lib/auth-client";
 import ReactMarkdown from "react-markdown";
+import { useState } from "react";
+import { applyToJobAction } from "@/actions/application";
+import { toast } from "sonner";
 
 const markdownComponents = {
    p: ({ children }: any) => <p className="mb-4 last:mb-0">{children}</p>,
@@ -24,6 +27,24 @@ const markdownComponents = {
 
 export default function JobDetailClient({ job }: { job: any }) {
    const { data: session } = useSession();
+   const [applying, setApplying] = useState(false);
+   const [applied, setApplied] = useState(false);
+
+   const handleApply = async () => {
+      if (!session) {
+         toast.error("Please login to apply");
+         return;
+      }
+      setApplying(true);
+      const res = await applyToJobAction(job.id);
+      setApplying(false);
+      if (res.success) {
+         setApplied(true);
+         toast.success("Application submitted successfully!");
+      } else {
+         toast.error(res.error || "Failed to apply");
+      }
+   };
 
    if (!job) {
       return (
@@ -229,10 +250,19 @@ export default function JobDetailClient({ job }: { job: any }) {
                {/* Right Column: Sidebar */}
                <aside className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
                   {/* Apply Now Button */}
-                  {job.externalApplyLink && (
+                  {job.externalApplyLink ? (
                      <a href={job.externalApplyLink} target="_blank" rel="noreferrer" className="w-full block py-3 px-4 bg-[#5415C6] hover:bg-[#430FA1] text-white font-medium rounded-lg shadow-sm transition-colors text-center">
-                        Apply Now
+                        Apply Now (External)
                      </a>
+                  ) : (
+                     <button
+                        type="button"
+                        onClick={handleApply}
+                        disabled={applying || applied}
+                        className="w-full block py-3 px-4 bg-[#5415C6] hover:bg-[#430FA1] text-white font-medium rounded-lg shadow-sm transition-colors text-center disabled:opacity-70 cursor-pointer"
+                     >
+                        {applied ? "Applied ✓" : applying ? "Applying..." : "Apply Now"}
+                     </button>
                   )}
 
                   {/* Registration Schedule */}

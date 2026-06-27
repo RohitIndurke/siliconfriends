@@ -24,6 +24,27 @@ export const auth = betterAuth({
         required: true,
         defaultValue: "student",
       },
+      rollNumber: {
+        type: "string",
+        required: false,
+      },
+      department: {
+        type: "string",
+        required: false,
+      },
+      cgpa: {
+        type: "number",
+        required: false,
+      },
+      skills: {
+        type: "string[]",
+        required: false,
+      },
+      placementStatus: {
+        type: "string",
+        required: false,
+        defaultValue: "Active",
+      },
     },
   },
 });

@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { createJobAction, updateJobAction } from "@/actions/job";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { DEPARTMENTS } from "./data";
 
 interface JobFormState {
     jobTitle: string;
@@ -83,25 +84,7 @@ const INITIAL_STATE: JobFormState = {
     externalApplyLink: "",
 };
 
-const ALL_COURSES = [
-    "B.Sc. - Cyber & Digital Science",
-    "B.Sc. - Animation",
-    "B.Sc. - Computer Science",
-    "M.Com. - Commerce",
-    "B.Com. - Commerce",
-    "B.B.A. - International Business",
-    "B.B.A. - Business Administration",
-    "M.Sc. - Computer Application",
-    "B.C.A. - Science",
-    "B.B.A. - Computer Applications",
-    "B.Sc. - Information Technology",
-    "M.Sc. - Cyber Security",
-    "B.Sc. - Artificial Intelligence & Machine Learning",
-    "B.Sc. - Data Science",
-    "M.Sc. - Information Technology",
-    "M.Sc. - Industrial Mathematics with Computer Applications",
-    "M.Sc. - Computer Science"
-];
+
 
 export interface JobCreationFormProps {
     onClose?: () => void;
@@ -352,7 +335,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Eligible Courses (Select all that apply)</label>
                                 <div className="flex flex-wrap gap-2 mt-1">
-                                    {ALL_COURSES.map(course => {
+                                    {DEPARTMENTS.map(course => {
                                         const isSelected = formData.eligibleCourses.includes(course);
                                         return (
                                             <button

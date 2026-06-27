@@ -113,7 +113,6 @@ const LOADING_MESSAGES = [
 export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
   // Step: 1=configure, 2=loading, 3=results
   const [step, setStep] = useState<1 | 2 | 3>(1);
-
   // Step 1 state
   const [selectedJob, setSelectedJob] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -147,7 +146,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
       setRecentResumes(res);
       setIsLoadingResumes(false);
     });
-    
+
     checkInterviewRateLimit().then((res) => {
       if (res.error) setRateLimitInfo({ limited: true, message: res.error });
       else setRateLimitInfo({ limited: false, message: "" });
@@ -209,6 +208,13 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
     if (!selectedJob) { toast.error("Please select a job."); return; }
     if (selectedCategories.length === 0) { toast.error("Select at least one question category."); return; }
 
+    const limitCheck = await checkInterviewRateLimit();
+    if (limitCheck.error) {
+      setRateLimitInfo({ limited: true, message: limitCheck.error });
+      toast.warning(limitCheck.error);
+      return;
+    }
+
     setStep(2);
 
     const fd = new FormData();
@@ -224,7 +230,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
 
     const startTime = Date.now();
     let result: any;
-    
+
     try {
       result = await generateInterviewQuestions(fd);
     } catch (e: any) {
@@ -260,6 +266,19 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
     setIsFlipped(false);
     setFilterCategory("All");
     setExpandedIdx(null);
+
+    if (!(result as any).fromCache) {
+      setRateLimitInfo({
+        limited: true,
+        message: "Please wait 15 minutes before generating new questions to prevent AI rate limiting."
+      });
+    } else {
+      checkInterviewRateLimit().then((res) => {
+        if (res.error) setRateLimitInfo({ limited: true, message: res.error });
+        else setRateLimitInfo({ limited: false, message: "" });
+      });
+    }
+
     setStep(3);
 
     if (fromCache && !("error" in result)) {
@@ -378,8 +397,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                     }
                   }}
                   className={`relative flex items-center rounded-lg border px-3 py-2 text-left transition-all ${selectedCategories.length === CATEGORIES.length
-                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                      : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
                     }`}
                 >
                   <div className="flex items-center gap-1.5">
@@ -395,8 +414,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                       id={`category-${cat.id.replace(/\s+/g, "-").toLowerCase()}`}
                       onClick={() => toggleCategory(cat.id)}
                       className={`relative flex items-center rounded-lg border px-3 py-2 text-left transition-all ${isSelected
-                          ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                          : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
                         }`}
                     >
                       <div className="flex items-center gap-1.5">
@@ -493,8 +512,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                           key={r.id}
                           onClick={() => handleUseRecentResume(r.id)}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all text-sm ${selectedResumeId === r.id
-                              ? "border-[#2563eb] bg-blue-50 text-[#2563eb]"
-                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                            ? "border-[#2563eb] bg-blue-50 text-[#2563eb]"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
                             }`}
                         >
                           <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="shrink-0">
@@ -563,11 +582,10 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                 <button
                   id="interview-generate-btn"
                   onClick={() => handleGenerate(false)}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all shadow-sm ${
-                    !selectedJob || selectedCategories.length === 0 || rateLimitInfo.limited
+                  className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all shadow-sm ${!selectedJob || selectedCategories.length === 0 || rateLimitInfo.limited
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-[#a855f7] hover:bg-[#9333ea] text-white"
-                  }`}
+                    }`}
                 >
                   <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -659,11 +677,10 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
           <div>
             <button
               onClick={() => handleGenerate(true)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                rateLimitInfo.limited 
-                  ? "bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed" 
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${rateLimitInfo.limited
+                  ? "bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed"
                   : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -692,8 +709,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
               setExpandedIdx(null);
             }}
             className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${filterCategory === cat
-                ? "bg-[#2563eb] text-white border-[#2563eb]"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              ? "bg-[#2563eb] text-white border-[#2563eb]"
+              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               }`}
           >
             {cat} {cat !== "All" && `(${questions.filter(q =>
@@ -805,8 +822,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
               onClick={prevCard}
               disabled={currentCardIdx === 0}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors ${currentCardIdx === 0
-                  ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
-                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
                 }`}
             >
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -822,8 +839,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
               onClick={nextCard}
               disabled={currentCardIdx === questions.length - 1}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors ${currentCardIdx === questions.length - 1
-                  ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
-                  : "bg-[#a855f7] border-[#a855f7] text-white hover:bg-[#9333ea]"
+                ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-[#a855f7] border-[#a855f7] text-white hover:bg-[#9333ea]"
                 }`}
             >
               Next

@@ -1,6 +1,10 @@
 import React from 'react';
 
-export default function AnalyticsTab() {
+export default function AnalyticsTab({ data }: { data?: any }) {
+  const placedStudents = data?.placedStudents ?? 0;
+  const totalStudents = data?.totalStudents ?? 0;
+  const placementRate = totalStudents > 0 ? Math.round((placedStudents / totalStudents) * 100) : 0;
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300 pb-10">
       {/* Header */}
@@ -12,37 +16,36 @@ export default function AnalyticsTab() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Placements */}
-        <div className="bg-white p-5 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 flex items-start gap-4 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#22c55e">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
           </div>
           <div>
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Placements</p>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">67</p>
-            <p className="text-xs text-gray-500">+12% vs last year</p>
+            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">{placedStudents}</p>
+            <p className="text-xs text-gray-500">Live DB count</p>
           </div>
         </div>
 
         {/* Placement Rate */}
-        <div className="bg-white p-5 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 flex items-start gap-4 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#3b82f6">
-               <circle cx="12" cy="12" r="7" strokeWidth="2" />
-               <circle cx="12" cy="12" r="3" strokeWidth="2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
           <div>
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Placement Rate</p>
-            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">54%</p>
-            <p className="text-xs text-gray-500">Target: 70%</p>
+            <p className="text-2xl font-bold text-gray-900 leading-none mb-1">{placementRate}%</p>
+            <p className="text-xs text-gray-500">Based on eligible pool</p>
           </div>
         </div>
 
         {/* Highest Package */}
-        <div className="bg-white p-5 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 flex items-start gap-4 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#f97316">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
@@ -55,8 +58,8 @@ export default function AnalyticsTab() {
         </div>
 
         {/* Avg Package */}
-        <div className="bg-white p-5 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 flex items-start gap-4 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#a855f7">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
@@ -71,7 +74,7 @@ export default function AnalyticsTab() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6">
           <h3 className="text-base font-bold text-gray-900 mb-4 sm:mb-6">Company-wise Placements</h3>
           <div className="overflow-x-auto">
             <div className="h-[220px] sm:h-[250px] flex items-end justify-between relative pl-8 pb-8 min-w-[280px]">
@@ -112,7 +115,7 @@ export default function AnalyticsTab() {
         </div>
 
         {/* Donut Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6">
           <h3 className="text-base font-bold text-gray-900 mb-4 sm:mb-6">Department-wise Distribution</h3>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-16 h-auto sm:h-[250px] py-4 sm:py-0">
              <div className="relative w-48 h-48">
@@ -135,16 +138,16 @@ export default function AnalyticsTab() {
              {/* Legend */}
              <div className="flex flex-col gap-3">
                 {[
-                  { name: 'CS', count: 42, color: 'bg-blue-600' },
-                  { name: 'IT', count: 22, color: 'bg-emerald-500' },
-                  { name: 'ECE', count: 15, color: 'bg-amber-500' },
-                  { name: 'Mech', count: 10, color: 'bg-violet-500' },
-                  { name: 'Civil', count: 8, color: 'bg-pink-500' },
+                  { name: 'B.Sc. CS', count: 32, color: 'bg-blue-600' },
+                  { name: 'B.C.A.', count: 24, color: 'bg-emerald-500' },
+                  { name: 'M.Sc. CS', count: 18, color: 'bg-amber-500' },
+                  { name: 'B.B.A.', count: 14, color: 'bg-violet-500' },
+                  { name: 'Data Sci.', count: 9, color: 'bg-pink-500' },
                 ].map((dept, i) => (
                    <div key={i} className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${dept.color}`}></div>
-                      <span className="text-xs text-gray-600 w-12">{dept.name}</span>
-                      <span className="text-xs font-mono font-bold text-gray-900">{dept.count}</span>
+                      <span className="text-xs text-gray-600 w-20 truncate">{dept.name}</span>
+                      <span className="text-xs font-mono font-bold text-gray-900 ml-auto">{dept.count}</span>
                    </div>
                 ))}
              </div>
@@ -153,7 +156,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Bottom Area Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
           <h3 className="text-base font-bold text-gray-900">Monthly Applications vs Placements Trend</h3>
           <div className="flex items-center gap-4 text-xs text-gray-500">
