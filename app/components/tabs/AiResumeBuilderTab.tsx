@@ -304,10 +304,10 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
     try {
       let logoDataUrl = preloadedLogoRef.current;
-      if (!logoDataUrl || logoDataUrl === "/logo.png") {
+      if (!logoDataUrl || !logoDataUrl.startsWith("data:")) {
         try {
-          const res = await fetch(window.location.origin + "/logo.png");
-          if (res.ok) {
+          const res = await fetch("/logo.png").catch(() => fetch(window.location.origin + "/logo.png"));
+          if (res && res.ok) {
             const blob = await res.blob();
             logoDataUrl = await new Promise((resolve) => {
               const reader = new FileReader();
@@ -317,7 +317,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             preloadedLogoRef.current = logoDataUrl;
           }
         } catch (e) {
-          logoDataUrl = window.location.origin + "/logo.png";
+          console.warn("Could not resolve logo base64", e);
         }
       }
       const { pdf, Document, Page, Text, View, StyleSheet, Font, Image } = await import('@react-pdf/renderer');
@@ -360,7 +360,9 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           <Page size="A4" style={styles.page}>
             <View style={styles.header}>
               <View style={styles.logoContainer}>
-                <Image src={logoDataUrl} style={styles.logo} />
+                {logoDataUrl && logoDataUrl.startsWith("data:") ? (
+                  <Image src={logoDataUrl} style={styles.logo} />
+                ) : null}
               </View>
               <View style={styles.headerText}>
                 <Text style={styles.name}>{resumeData.name}</Text>
@@ -407,7 +409,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Professional Experience</Text>
                 {resumeData.experience.map((exp: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }} wrap={false}>
+                  <View key={i} style={{ marginBottom: 6 }}>
                     <View style={styles.row}>
                       <Text style={styles.itemTitle}>{exp.title}</Text>
                       <Text style={styles.dateText}>{exp.duration}</Text>
@@ -428,7 +430,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Projects</Text>
                 {resumeData.projects.map((proj: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }} wrap={false}>
+                  <View key={i} style={{ marginBottom: 6 }}>
                     <View style={styles.row}>
                       <Text style={styles.itemTitle}>{proj.name}</Text>
                       <Text style={styles.dateText}>{proj.duration}</Text>
@@ -449,7 +451,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Education</Text>
                 {resumeData.education.map((edu: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }} wrap={false}>
+                  <View key={i} style={{ marginBottom: 6 }}>
                     <View style={styles.row}>
                       <Text style={[styles.itemTitle, { color: '#111827' }]}>{edu.institution}</Text>
                       <Text style={styles.dateText}>{edu.duration}</Text>
@@ -464,7 +466,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Certifications & Licenses</Text>
                 {resumeData.certifications.map((cert: any, i: number) => (
-                  <View key={i} style={styles.bulletRow} wrap={false}>
+                  <View key={i} style={styles.bulletRow}>
                     <Text style={styles.bulletPoint}>•</Text>
                     <Text style={styles.bulletContent}>
                       <Text style={{ fontWeight: 'bold', color: '#1e3a8a' }}>{cert.name}</Text>
