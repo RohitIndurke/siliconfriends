@@ -52,7 +52,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const preloadedLogoRef = useRef<string>("/logo.png");
 
   useEffect(() => {
-    import('@react-pdf/renderer').catch(() => {});
+    import('@react-pdf/renderer').catch(() => { });
     if (typeof window !== "undefined") {
       fetch(window.location.origin + "/logo.png")
         .then(res => res.blob())
@@ -61,7 +61,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           reader.onloadend = () => { preloadedLogoRef.current = reader.result as string; };
           reader.readAsDataURL(blob);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, []);
 
@@ -320,196 +320,29 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           console.warn("Could not resolve logo base64", e);
         }
       }
-      const { pdf, Document, Page, Text, View, StyleSheet, Font, Image } = await import('@react-pdf/renderer');
 
-      const styles = StyleSheet.create({
-        page: { paddingHorizontal: 40, paddingVertical: 40, fontFamily: 'Helvetica', fontSize: 10, color: '#111827' },
-        header: { flexDirection: 'row', alignItems: 'flex-start', borderBottom: '1.5pt solid #1e3a8a', paddingBottom: 12, marginBottom: 15 },
-        logoContainer: { marginRight: 30 },
-        logo: { width: 110, maxHeight: 75, objectFit: 'contain' },
-        headerText: { flex: 1 },
-        name: { fontSize: 17, fontWeight: 'bold', color: '#1e3a8a', textTransform: 'uppercase', marginBottom: 5 },
-        contact: { fontSize: 9, color: '#4b5563', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' },
-        contactItem: { marginRight: 4 },
-        separator: { marginHorizontal: 4, color: '#9ca3af' },
-        section: { marginBottom: 12 },
-        sectionTitle: {
-          fontSize: 11,
-          fontWeight: 'bold',
-          color: '#1e3a8a',
-          textTransform: 'uppercase',
-          borderBottom: '1pt solid #bfdbfe',
-          marginBottom: 6,
-          paddingBottom: 2
-        },
-        row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 },
-        itemTitle: { fontSize: 10, color: '#1e3a8a' },
-        itemSubtitle: { fontSize: 9, color: '#374151' },
-        dateText: { fontSize: 9, color: '#6b7280' },
-        text: { fontSize: 9, lineHeight: 1.4, color: '#374151' },
-        bulletRow: { flexDirection: 'row', marginBottom: 2 },
-        bulletPoint: { width: 10, fontSize: 9, color: '#374151' },
-        bulletContent: { flex: 1, fontSize: 9, lineHeight: 1.4, color: '#374151' },
-        skillRow: { flexDirection: 'row', marginBottom: 3 },
-        skillCategory: { width: 90, fontSize: 9, fontWeight: 'bold', color: '#111827' },
-        skillList: { flex: 1, fontSize: 9, color: '#374151' }
+      toast.info("Generating vector PDF on server...");
+
+      const response = await fetch('/api/resume/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeData,
+          logoDataUrl: preloadedLogoRef.current
+        })
       });
 
-      const doc = (
-        <Document>
-          <Page size="A4" style={styles.page}>
-            <View style={styles.header}>
-              <View style={styles.logoContainer}>
-                {logoDataUrl && logoDataUrl.startsWith("data:") ? (
-                  <Image src={logoDataUrl} style={styles.logo} />
-                ) : null}
-              </View>
-              <View style={styles.headerText}>
-                <Text style={styles.name}>{resumeData.name}</Text>
-                <View style={styles.contact}>
-                  {resumeData.location && <Text style={styles.contactItem}>{resumeData.location}</Text>}
-                  {resumeData.location && (resumeData.email || resumeData.phone) && <Text style={styles.separator}>|</Text>}
-                  {resumeData.email && <Text style={styles.contactItem}>{resumeData.email}</Text>}
-                  {resumeData.email && resumeData.phone && <Text style={styles.separator}>|</Text>}
-                  {resumeData.phone && <Text style={styles.contactItem}>{resumeData.phone}</Text>}
-                </View>
-                {parseSocials(resumeData.socials).length > 0 && (
-                  <View style={[styles.contact, { marginTop: 3 }]}>
-                    {parseSocials(resumeData.socials).map((soc, idx, arr) => (
-                      <View key={idx} style={{ flexDirection: 'row' }}>
-                        <Text style={styles.contactItem}>{soc}</Text>
-                        {idx < arr.length - 1 && <Text style={styles.separator}>|</Text>}
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            </View>
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to generate PDF on server");
+      }
 
-            {resumeData.executiveSummary ? (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Profile Summary</Text>
-                <Text style={styles.text}>{resumeData.executiveSummary}</Text>
-              </View>
-            ) : null}
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Technical Skills</Text>
-              {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => skills.length > 0 ? (
-                <View key={category} style={styles.skillRow}>
-                  <Text style={styles.skillCategory}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}:
-                  </Text>
-                  <Text style={styles.skillList}>{(skills as string[]).join(', ')}</Text>
-                </View>
-              ) : null)}
-            </View>
-
-            {resumeData.experience && resumeData.experience.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Professional Experience</Text>
-                {resumeData.experience.map((exp: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={styles.itemTitle}>{exp.title}</Text>
-                      <Text style={styles.dateText}>{exp.duration}</Text>
-                    </View>
-                    <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>{exp.company}</Text>
-                    {exp.description && exp.description.map((bullet: string, j: number) => (
-                      <View key={j} style={styles.bulletRow}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletContent}>{bullet}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.projects && resumeData.projects.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Projects</Text>
-                {resumeData.projects.map((proj: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={styles.itemTitle}>{proj.name}</Text>
-                      <Text style={styles.dateText}>{proj.duration}</Text>
-                    </View>
-                    {proj.techStack && <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>Tech Stack: {proj.techStack}</Text>}
-                    {proj.description && proj.description.map((bullet: string, j: number) => (
-                      <View key={j} style={styles.bulletRow}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletContent}>{bullet}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.education && resumeData.education.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Education</Text>
-                {resumeData.education.map((edu: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={[styles.itemTitle, { color: '#111827' }]}>{edu.institution}</Text>
-                      <Text style={styles.dateText}>{edu.duration}</Text>
-                    </View>
-                    <Text style={styles.text}>{edu.degree} {edu.score ? `| ${edu.score}` : ''}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.certifications && resumeData.certifications.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Certifications & Licenses</Text>
-                {resumeData.certifications.map((cert: any, i: number) => (
-                  <View key={i} style={styles.bulletRow}>
-                    <Text style={styles.bulletPoint}>•</Text>
-                    <Text style={styles.bulletContent}>
-                      <Text style={{ fontWeight: 'bold', color: '#1e3a8a' }}>{cert.name}</Text>
-                      {cert.issuer ? ` – ${cert.issuer}` : ''}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.activities && resumeData.activities.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Activities, Leadership & Achievements</Text>
-                {resumeData.activities.map((act: string, i: number) => (
-                  <View key={i} style={styles.bulletRow}>
-                    <Text style={styles.bulletPoint}>•</Text>
-                    <Text style={styles.bulletContent}>{act}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.interests && resumeData.interests.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Interests</Text>
-                <Text style={styles.text}>{resumeData.interests.join(', ')}</Text>
-              </View>
-            )}
-
-          </Page>
-        </Document>
-      );
-
-      const blobPromise = pdf(doc).toBlob();
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("PDF generation timed out after 25 seconds.")), 25000)
-      );
-      const blob = await Promise.race([blobPromise, timeoutPromise]);
+      const blob = await response.blob();
       clearTimeout(safetyTimer);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${resumeData.name.replace(/\s+/g, '_')}_Resume.pdf`;
+      link.download = `${(resumeData.name || "Resume").replace(/\s+/g, '_')}_Resume.pdf`;
       link.click();
       URL.revokeObjectURL(url);
       toast.success("Resume downloaded successfully!");

@@ -36,9 +36,9 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] font-sans">
+    <div className="min-h-screen bg-[#f5f5f5] font-sans print:bg-white print:min-h-0">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm print:hidden">
         <div className="mx-auto max-w-[1300px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image
@@ -90,9 +90,9 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-[1300px] px-4 sm:px-6 py-5">
+      <main className="mx-auto max-w-[1300px] px-4 sm:px-6 py-5 print:p-0 print:max-w-none">
         {/* Page Title + Admin Buttons (mobile) */}
-        <div className="flex items-center justify-between gap-3 mb-5">
+        <div className="flex items-center justify-between gap-3 mb-5 print:hidden">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7C3AED"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -105,7 +105,7 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
 
         {/* Tabs */}
 
-        <div className="border-b border-gray-200 mb-5 sticky top-[52px] sm:top-[60px] z-40 bg-[#f5f5f5] pt-2 pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6">
+        <div className="border-b border-gray-200 mb-5 sticky top-[52px] sm:top-[60px] z-40 bg-[#f5f5f5] pt-2 pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6 print:hidden">
           <div className="flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar">
             {STUDENT_TABS.map((tab) => (
               <button
