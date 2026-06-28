@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { DEPARTMENTS } from '@/app/components/data';
+import { deleteStudentAction } from '@/actions/application';
+import { toast } from 'sonner';
+import { AlertDialog, Button } from "@heroui/react";
 
 interface StudentsTabProps {
   students: any[];
@@ -10,6 +13,22 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState("All Departments");
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
+  const [isPending, startTransition] = useTransition();
+  const [studentToDelete, setStudentToDelete] = useState<{ id: string; name: string } | null>(null);
+
+  const confirmDelete = () => {
+    if (!studentToDelete) return;
+    const { id, name } = studentToDelete;
+    startTransition(async () => {
+      const res = await deleteStudentAction(id);
+      if (res.success) {
+        toast.success(`${name} has been deleted successfully.`);
+        setStudentToDelete(null);
+      } else {
+        toast.error(res.error || "Failed to delete student.");
+      }
+    });
+  };
 
   const formattedStudents = students.map((s) => {
     const initials = s.name
@@ -185,7 +204,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
                     <p className="text-gray-600 truncate">{student.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
                   <div className="flex flex-wrap gap-1.5">
                     {student.skills.map((skill: string, j: number) => (
                       <span key={j} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md">
@@ -198,6 +217,16 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
                       </span>
                     )}
                   </div>
+                  <button
+                    onClick={() => setStudentToDelete({ id: student.id, name: student.name })}
+                    disabled={isPending}
+                    title="Delete Student"
+                    className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors ml-2 shrink-0"
+                  >
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             ))}
@@ -215,6 +244,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
                     <th className="px-6 py-4 font-medium">CGPA</th>
                     <th className="px-6 py-4 font-medium">Skills</th>
                     <th className="px-6 py-4 font-medium">Status</th>
+                    <th className="px-6 py-4 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -253,6 +283,18 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
                           {student.status}
                         </span>
                       </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => setStudentToDelete({ id: student.id, name: student.name })}
+                          disabled={isPending}
+                          title="Delete Student"
+                          className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -261,6 +303,33 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
           </div>
         </>
       )}
+
+      {/* HeroUI Deletion Confirmation AlertDialog */}
+      <AlertDialog isOpen={!!studentToDelete} onOpenChange={(open) => !open && setStudentToDelete(null)}>
+        <AlertDialog.Backdrop>
+          <AlertDialog.Container>
+            <AlertDialog.Dialog className="sm:max-w-[400px] bg-white text-gray-900 border border-gray-200 shadow-xl">
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="danger" />
+                <AlertDialog.Heading className="text-lg font-bold text-gray-900">Delete student permanently?</AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="text-sm text-gray-600">
+                <p>
+                  This will permanently delete <strong className="text-gray-900">{studentToDelete?.name}</strong> and all of their applications, resumes, and accounts. This action cannot be undone.
+                </p>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button variant="tertiary" className="text-gray-700 bg-gray-100 hover:bg-gray-200 font-medium px-4 py-2 rounded-xl" onPress={() => setStudentToDelete(null)} isDisabled={isPending}>
+                  Cancel
+                </Button>
+                <Button variant="danger" className="bg-red-600 text-white hover:bg-red-700 font-medium px-4 py-2 rounded-xl shadow-md shadow-red-500/20" onPress={confirmDelete} isDisabled={isPending}>
+                  {isPending ? "Deleting..." : "Delete Student"}
+                </Button>
+              </AlertDialog.Footer>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </div>
   );
 }

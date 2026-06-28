@@ -13,6 +13,21 @@ const MOCK_JOB_REQUIREMENTS = [
   "Ability to work in agile teams",
 ];
 
+const parseSocials = (socials?: any): string[] => {
+  if (!socials) return [];
+  if (Array.isArray(socials)) {
+    return socials.map(s => String(s).trim()).filter(Boolean);
+  }
+  if (typeof socials !== "string") return [];
+  const cleaned = socials
+    .replace(/https?:\/\/\s*[,|]\s*/gi, "https://")
+    .replace(/www\.\s*[,|]\s*/gi, "www.");
+  return cleaned
+    .split(/[,|\n]+/)
+    .map(s => s.trim().replace(/^\|\s*/, "").replace(/\s*\|$/, ""))
+    .filter(Boolean);
+};
+
 export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const [step, setStep] = useState(1);
   const [selectedJob, setSelectedJob] = useState("");
@@ -34,6 +49,21 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const [recentResumes, setRecentResumes] = useState<any[]>([]);
   const [isLoadingResumes, setIsLoadingResumes] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const preloadedLogoRef = useRef<string>("/logo.png");
+
+  useEffect(() => {
+    import('@react-pdf/renderer').catch(() => { });
+    if (typeof window !== "undefined") {
+      fetch(window.location.origin + "/logo.png")
+        .then(res => res.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => { preloadedLogoRef.current = reader.result as string; };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => { });
+    }
+  }, []);
 
   useEffect(() => {
     if (step === 2) {
@@ -265,181 +295,63 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   };
 
   const handleDownloadPDF = async () => {
+    if (isDownloading) return;
     setIsDownloading(true);
-    try {
-      const { pdf, Document, Page, Text, View, StyleSheet, Font } = await import('@react-pdf/renderer');
+    const safetyTimer = setTimeout(() => {
+      setIsDownloading(false);
+      toast.error("Download took too long. Please try clicking again.");
+    }, 30000);
 
-      const styles = StyleSheet.create({
-        page: { paddingHorizontal: 40, paddingVertical: 40, fontFamily: 'Helvetica', fontSize: 10, color: '#111827' },
-        header: { textAlign: 'center', marginBottom: 15 },
-        name: { fontSize: 20, fontWeight: 'bold', color: '#1e3a8a', textTransform: 'uppercase', marginBottom: 5 },
-        contact: { fontSize: 9, color: '#4b5563', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' },
-        contactItem: { marginHorizontal: 4 },
-        section: { marginBottom: 12 },
-        sectionTitle: { 
-          fontSize: 11, 
-          fontWeight: 'bold', 
-          color: '#1e3a8a', 
-          textTransform: 'uppercase', 
-          borderBottom: '1pt solid #bfdbfe', 
-          marginBottom: 6, 
-          paddingBottom: 2 
-        },
-        row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 },
-        itemTitle: { fontSize: 10, color: '#1e3a8a' },
-        itemSubtitle: { fontSize: 9, color: '#374151' },
-        dateText: { fontSize: 9, color: '#6b7280' },
-        text: { fontSize: 9, lineHeight: 1.4, color: '#374151' },
-        bulletRow: { flexDirection: 'row', marginBottom: 2 },
-        bulletPoint: { width: 10, fontSize: 9, color: '#374151' },
-        bulletContent: { flex: 1, fontSize: 9, lineHeight: 1.4, color: '#374151' },
-        skillRow: { flexDirection: 'row', marginBottom: 3 },
-        skillCategory: { width: 90, fontSize: 9, fontWeight: 'bold', color: '#111827' },
-        skillList: { flex: 1, fontSize: 9, color: '#374151' }
+    try {
+      let logoDataUrl = preloadedLogoRef.current;
+      if (!logoDataUrl || !logoDataUrl.startsWith("data:")) {
+        try {
+          const res = await fetch("/logo.png").catch(() => fetch(window.location.origin + "/logo.png"));
+          if (res && res.ok) {
+            const blob = await res.blob();
+            logoDataUrl = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(blob);
+            });
+            preloadedLogoRef.current = logoDataUrl;
+          }
+        } catch (e) {
+          console.warn("Could not resolve logo base64", e);
+        }
+      }
+
+      toast.info("Generating vector PDF on server...");
+
+      const response = await fetch('/api/resume/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeData,
+          logoDataUrl: preloadedLogoRef.current
+        })
       });
 
-      const doc = (
-        <Document>
-          <Page size="A4" style={styles.page}>
-            <View style={styles.header}>
-              <Text style={styles.name}>{resumeData.name}</Text>
-              <View style={styles.contact}>
-                {resumeData.location && <Text style={styles.contactItem}>{resumeData.location}</Text>}
-                {resumeData.location && (resumeData.email || resumeData.phone) && <Text>|</Text>}
-                {resumeData.email && <Text style={styles.contactItem}>{resumeData.email}</Text>}
-                {resumeData.email && resumeData.phone && <Text>|</Text>}
-                {resumeData.phone && <Text style={styles.contactItem}>{resumeData.phone}</Text>}
-                {resumeData.socials && <Text>|</Text>}
-                {resumeData.socials && <Text style={styles.contactItem}>{resumeData.socials}</Text>}
-              </View>
-            </View>
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to generate PDF on server");
+      }
 
-            {resumeData.executiveSummary ? (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Profile Summary</Text>
-                <Text style={styles.text}>{resumeData.executiveSummary}</Text>
-              </View>
-            ) : null}
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Technical Skills</Text>
-              {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => skills.length > 0 ? (
-                <View key={category} style={styles.skillRow}>
-                  <Text style={styles.skillCategory}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}:
-                  </Text>
-                  <Text style={styles.skillList}>{(skills as string[]).join(', ')}</Text>
-                </View>
-              ) : null)}
-            </View>
-
-            {resumeData.experience && resumeData.experience.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Professional Experience</Text>
-                {resumeData.experience.map((exp: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={styles.itemTitle}>{exp.title}</Text>
-                      <Text style={styles.dateText}>{exp.duration}</Text>
-                    </View>
-                    <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>{exp.company}</Text>
-                    {exp.description && exp.description.map((bullet: string, j: number) => (
-                      <View key={j} style={styles.bulletRow}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletContent}>{bullet}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.projects && resumeData.projects.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Projects</Text>
-                {resumeData.projects.map((proj: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={styles.itemTitle}>{proj.name}</Text>
-                      <Text style={styles.dateText}>{proj.duration}</Text>
-                    </View>
-                    {proj.techStack && <Text style={[styles.itemSubtitle, { marginBottom: 3 }]}>Tech Stack: {proj.techStack}</Text>}
-                    {proj.description && proj.description.map((bullet: string, j: number) => (
-                      <View key={j} style={styles.bulletRow}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletContent}>{bullet}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.education && resumeData.education.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Education</Text>
-                {resumeData.education.map((edu: any, i: number) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <View style={styles.row}>
-                      <Text style={[styles.itemTitle, { color: '#111827' }]}>{edu.institution}</Text>
-                      <Text style={styles.dateText}>{edu.duration}</Text>
-                    </View>
-                    <Text style={styles.text}>{edu.degree} {edu.score ? `| ${edu.score}` : ''}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.certifications && resumeData.certifications.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Certifications & Licenses</Text>
-                {resumeData.certifications.map((cert: any, i: number) => (
-                  <View key={i} style={styles.bulletRow}>
-                    <Text style={styles.bulletPoint}>•</Text>
-                    <Text style={styles.bulletContent}>
-                      <Text style={{ fontWeight: 'bold', color: '#1e3a8a' }}>{cert.name}</Text> 
-                      {cert.issuer ? ` – ${cert.issuer}` : ''}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.activities && resumeData.activities.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Activities, Leadership & Achievements</Text>
-                {resumeData.activities.map((act: string, i: number) => (
-                  <View key={i} style={styles.bulletRow}>
-                    <Text style={styles.bulletPoint}>•</Text>
-                    <Text style={styles.bulletContent}>{act}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {resumeData.interests && resumeData.interests.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Interests</Text>
-                <Text style={styles.text}>{resumeData.interests.join(', ')}</Text>
-              </View>
-            )}
-
-          </Page>
-        </Document>
-      );
-
-      const blob = await pdf(doc).toBlob();
+      const blob = await response.blob();
+      clearTimeout(safetyTimer);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${resumeData.name.replace(/\s+/g, '_')}_Resume.pdf`;
+      link.download = `${(resumeData.name || "Resume").replace(/\s+/g, '_')}_Resume.pdf`;
       link.click();
       URL.revokeObjectURL(url);
       toast.success("Resume downloaded successfully!");
     } catch (err: any) {
+      clearTimeout(safetyTimer);
       console.error("PDF Generation Error:", err);
       toast.error(`Failed to generate PDF: ${err.message || "Unknown error"}`);
     } finally {
+      clearTimeout(safetyTimer);
       setIsDownloading(false);
     }
   };
@@ -791,7 +703,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                             <input
                               type="text"
                               placeholder="Type & Enter..."
-                              className="flex-1 min-w-[100px] outline-none text-sm bg-transparent py-1"
+                              className="flex-1 min-w-[100px] outline-none text-sm text-gray-900 placeholder:text-gray-500 font-medium bg-transparent py-1"
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ',') {
                                   e.preventDefault();
@@ -810,7 +722,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
                     <div className="pt-4 border-t border-gray-200">
                       <p className="text-xs font-semibold text-gray-500 mb-3">Note: For structured sections below (Experience, Projects, Education, Certifications), direct editing is available via raw JSON in advanced mode or just continue to preview.</p>
-                      
+
                       {/* Advanced JSON Editor for deeply nested structures */}
                       <details className="cursor-pointer group">
                         <summary className="text-sm font-bold text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1">
@@ -896,7 +808,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Generating...
+                    Downloading PDF...
                   </>
                 ) : (
                   <>
@@ -912,17 +824,30 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
           {/* Resume Preview Document (Mock - Matches PDF visually) */}
           <div id="resume-preview-document" className="bg-white rounded-sm shadow-xl border border-gray-200 p-8 sm:p-14 min-h-[800px] font-sans text-gray-800 leading-snug">
-            
-            <div className="text-center mb-6">
-              <h1 className="text-[26px] font-bold text-[#1e3a8a] uppercase tracking-wide mb-1.5">{resumeData.name}</h1>
-              <div className="text-[12px] text-gray-600 flex flex-wrap justify-center items-center gap-x-2 gap-y-1">
-                {resumeData.location && <span>{resumeData.location}</span>}
-                {resumeData.location && (resumeData.email || resumeData.phone) && <span>|</span>}
-                {resumeData.email && <span>{resumeData.email}</span>}
-                {resumeData.email && resumeData.phone && <span>|</span>}
-                {resumeData.phone && <span>{resumeData.phone}</span>}
-                {resumeData.socials && <span>|</span>}
-                {resumeData.socials && <span>{resumeData.socials}</span>}
+
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 border-b-2 border-[#1e3a8a] pb-5 mb-6">
+              <div className="shrink-0">
+                <img src="/logo.png" alt="Logo" className="w-32 sm:w-40 h-auto max-h-24 object-contain object-left-top" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h1 className="text-[20px] sm:text-[22px] font-extrabold text-[#1e3a8a] uppercase tracking-wide leading-none mb-2">{resumeData.name}</h1>
+                <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium mb-1.5">
+                  {resumeData.location && <span>{resumeData.location}</span>}
+                  {resumeData.location && (resumeData.email || resumeData.phone) && <span className="text-gray-300">|</span>}
+                  {resumeData.email && <span>{resumeData.email}</span>}
+                  {resumeData.email && resumeData.phone && <span className="text-gray-300">|</span>}
+                  {resumeData.phone && <span>{resumeData.phone}</span>}
+                </div>
+                {parseSocials(resumeData.socials).length > 0 && (
+                  <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium">
+                    {parseSocials(resumeData.socials).map((soc, idx, arr) => (
+                      <React.Fragment key={idx}>
+                        <span>{soc}</span>
+                        {idx < arr.length - 1 && <span className="text-gray-300">|</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1045,7 +970,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                 </div>
               </div>
             )}
-            
+
           </div>
         </div>
       )}

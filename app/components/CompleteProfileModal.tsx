@@ -95,7 +95,7 @@ export const CompleteProfileModal = ({
             </label>
             <input
               type="text"
-              placeholder="e.g. CS2024001"
+              placeholder="e.g. FYI3301"
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
               required
@@ -156,9 +156,8 @@ export const CompleteProfileModal = ({
           <button
             type="submit"
             disabled={loading}
-            className={`mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all text-sm flex items-center justify-center shadow-md shadow-blue-500/20 ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all text-sm flex items-center justify-center shadow-md shadow-blue-500/20 ${loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
           >
             {loading ? (
               <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

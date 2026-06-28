@@ -19,7 +19,7 @@ export async function getRecentResumes() {
       .where(eq(userResume.userId, session.user.id))
       .orderBy(desc(userResume.createdAt))
       .limit(5);
-    
+
     return resumes;
   } catch (err) {
     console.error("Failed to get recent resumes", err);
@@ -41,7 +41,7 @@ export async function deleteRecentResume(resumeId: string) {
           eq(userResume.userId, session.user.id)
         )
       );
-    
+
     return { success: true };
   } catch (err) {
     console.error("Failed to delete recent resume", err);
@@ -75,12 +75,12 @@ export async function parseResumeAndCompare(formData: FormData) {
         resumeText = await new Promise<string>((resolve, reject) => {
           const PDFParser = require("pdf2json");
           const pdfParser = new PDFParser(null, 1);
-          
+
           pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError?.message || "PDF parsing failed")));
           pdfParser.on("pdfParser_dataReady", () => {
-              resolve(pdfParser.getRawTextContent());
+            resolve(pdfParser.getRawTextContent());
           });
-          
+
           pdfParser.parseBuffer(buffer);
         });
       } else {
