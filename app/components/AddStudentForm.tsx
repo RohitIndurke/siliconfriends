@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { signUp } from "@/lib/auth-client";
+import { adminCreateStudentAction } from "@/actions/application";
 import * as XLSX from "xlsx";
 
 interface BulkStudent {
@@ -45,24 +45,21 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
       return;
     }
 
-    await signUp.email({
+    const res = await adminCreateStudentAction({
       email: email.trim(),
       password: finalPassword,
       name: name.trim(),
-      role: "student",
-      fetchOptions: {
-        onSuccess: () => {
-          setSuccess(true);
-          setTimeout(() => {
-            onClose();
-          }, 1200);
-        },
-        onError: (ctx: any) => {
-          setError(ctx.error.message || "Failed to register student.");
-          setLoading(false);
-        },
-      },
-    } as any);
+    });
+
+    if (res.success) {
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 1200);
+    } else {
+      setError(res.error || "Failed to register student.");
+      setLoading(false);
+    }
   };
 
   // Handle Excel File Upload
@@ -132,24 +129,16 @@ export const AddStudentForm = ({ onClose }: { onClose: () => void }) => {
       const student = bulkStudents[i];
 
       try {
-        await new Promise<void>((resolve) => {
-          signUp.email({
-            email: student.email,
-            password: finalPassword,
-            name: student.name,
-            role: "student",
-            fetchOptions: {
-              onSuccess: () => {
-                successCount++;
-                resolve();
-              },
-              onError: () => {
-                failCount++;
-                resolve();
-              },
-            },
-          } as any);
+        const res = await adminCreateStudentAction({
+          email: student.email,
+          password: finalPassword,
+          name: student.name,
         });
+        if (res.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
       } catch {
         failCount++;
       }

@@ -121,6 +121,7 @@ export async function getPlacementAnalyticsAction() {
         ctcFixedLpa: job.ctcFixedLpa,
         stipendMonthly: job.stipendMonthly,
         userId: jobApplication.userId,
+        appliedAt: jobApplication.appliedAt,
       })
       .from(jobApplication)
       .innerJoin(job, eq(jobApplication.jobId, job.id));
@@ -129,13 +130,39 @@ export async function getPlacementAnalyticsAction() {
     const selectedUserIds = new Set(allApps.filter(a => a.status === "Selected").map(a => a.userId));
     const placedStudents = allStudents.filter((s) => s.placementStatus === "Placed" || selectedUserIds.has(s.id)).length;
 
+    const activeJobsList = allJobs.filter(j => !j.status || !j.status.toLowerCase().includes("closed"));
+    const activeJobs = activeJobsList.length;
+    const uniqueCompanies = new Set(allJobs.map(j => j.companyName)).size;
+
+    const interviewingUserIds = new Set(
+      allApps
+        .filter(a => (a.status === "Interview" || a.status === "Shortlisted") && !selectedUserIds.has(a.userId))
+        .map(a => a.userId)
+    );
+    const interviewingStudents = allStudents.filter(s => interviewingUserIds.has(s.id) && s.placementStatus !== "Placed").length;
+    const activeStudents = Math.max(0, totalStudents - placedStudents - interviewingStudents);
+
+    const companyDrivesMap: Record<string, { id: string; companyName: string; dateStr: string; roleCount: number }> = {};
+    activeJobsList.forEach(j => {
+      if (!companyDrivesMap[j.companyName]) {
+        let dateStr = "Recently";
+        try {
+          const d = j.opensAt || j.closesAt || j.createdAt;
+          if (d) dateStr = new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        } catch (e) {}
+        companyDrivesMap[j.companyName] = { id: j.id, companyName: j.companyName, dateStr, roleCount: 0 };
+      }
+      companyDrivesMap[j.companyName].roleCount += 1;
+    });
+    const upcomingDrives = Object.values(companyDrivesMap).slice(0, 5);
+
     // 1. Highest & Avg Package calculation from jobs in DB
     const jobsWithSalary = allJobs.filter(j => (j.ctcFixedLpa && j.ctcFixedLpa > 0) || (j.stipendMonthly && j.stipendMonthly > 0));
     
-    let highestPackage = "35 LPA";
-    let highestPackageDetail = "Google — SE L3";
-    let avgPackage = "18.2 LPA";
-    let avgPackageDetail = "Across all companies";
+    let highestPackage = "N/A";
+    let highestPackageDetail = "No CTC recorded yet";
+    let avgPackage = "N/A";
+    let avgPackageDetail = "No CTC recorded yet";
 
     if (jobsWithSalary.length > 0) {
       const getLpa = (j: any) => {
@@ -185,19 +212,9 @@ export async function getPlacementAnalyticsAction() {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
-    if (sortedDepts.length === 0) {
-      sortedDepts = [
-        { name: "Computer Science", count: 32 },
-        { name: "Science", count: 24 },
-        { name: "Ind Math & CS", count: 18 },
-        { name: "Business Admin", count: 14 },
-        { name: "Data Science", count: 9 },
-      ];
-    }
-
     const totalDeptStudents = sortedDepts.reduce((sum, d) => sum + d.count, 0);
     const radius = 35;
-    const circumference = 2 * Math.PI * radius; // 219.91
+    const circumference = 2 * Math.PI * radius;
     let accumulatedOffset = 0;
 
     const departmentDistribution = sortedDepts.slice(0, 6).map((dept, index) => {
@@ -234,24 +251,50 @@ export async function getPlacementAnalyticsAction() {
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
-    if (companyPlacements.length === 0) {
-      companyPlacements = [
-        { label: 'Amazon', value: 15 },
-        { label: 'Google', value: 12 },
-        { label: 'Microsoft', value: 9 },
-        { label: 'Flipkart', value: 7 },
-        { label: 'Deloitte', value: 8 },
-        { label: 'Infosys', value: 18 },
-      ];
-    }
+    const maxCompanyVal = companyPlacements.length > 0 ? Math.max(...companyPlacements.map(c => c.value), 5) : 10;
 
-    const maxCompanyVal = Math.max(...companyPlacements.map(c => c.value), 20);
+    // 4. Monthly Trend (Last 5 months)
+    const months: string[] = [];
+    const now = new Date();
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push(d.toLocaleDateString("en-US", { month: "short" }));
+    }
+    const appCounts = [0, 0, 0, 0, 0];
+    const placedCounts = [0, 0, 0, 0, 0];
+
+    allApps.forEach(a => {
+      if (a.appliedAt) {
+        const d = new Date(a.appliedAt);
+        const diffMonths = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+        if (diffMonths >= 0 && diffMonths < 5) {
+          const idx = 4 - diffMonths;
+          appCounts[idx]++;
+          if (a.status === "Selected") {
+            placedCounts[idx]++;
+          }
+        }
+      }
+    });
+
+    const maxMonthlyVal = Math.max(...appCounts, ...placedCounts, 5);
+    const monthlyTrend = {
+      labels: months,
+      applications: appCounts,
+      placements: placedCounts,
+      maxVal: maxMonthlyVal,
+    };
 
     return {
       success: true,
       data: {
         totalStudents,
         placedStudents,
+        activeJobs,
+        uniqueCompanies,
+        interviewingStudents,
+        activeStudents,
+        upcomingDrives,
         highestPackage,
         highestPackageDetail,
         avgPackage,
@@ -259,6 +302,7 @@ export async function getPlacementAnalyticsAction() {
         departmentDistribution,
         companyPlacements,
         maxCompanyVal,
+        monthlyTrend,
       },
     };
   } catch (error) {
@@ -286,5 +330,34 @@ export async function deleteStudentAction(studentId: string) {
   } catch (error) {
     console.error("Error deleting student:", error);
     return { success: false, error: "Failed to delete student." };
+  }
+}
+
+export async function adminCreateStudentAction(data: { name: string; email: string; password?: string }) {
+  const session = await getTypedSession();
+  if (!session || session.user.role !== "admin") {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const { auth } = await import("@/lib/auth");
+    const res = await auth.api.signUpEmail({
+      body: {
+        email: data.email.trim(),
+        password: data.password || "mitalandi",
+        name: data.name.trim(),
+        role: "student",
+      },
+    });
+
+    if (res?.user?.id) {
+      await db.delete(sessionTable).where(eq(sessionTable.userId, res.user.id));
+    }
+
+    revalidatePath("/admin");
+    return { success: true, data: res?.user };
+  } catch (error: any) {
+    console.error("Error creating student server-side:", error);
+    return { success: false, error: error?.message || "Failed to create student account." };
   }
 }

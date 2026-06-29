@@ -7,6 +7,12 @@ export default function DashboardTab({ data }: { data?: any }) {
   const uniqueCompanies = data?.uniqueCompanies ?? 0;
   const placedStudents = data?.placedStudents ?? 0;
   const placementRate = totalStudents > 0 ? Math.round((placedStudents / totalStudents) * 100) : 0;
+  const interviewingStudents = data?.interviewingStudents ?? 0;
+  const activeStudents = data?.activeStudents ?? Math.max(0, totalStudents - placedStudents);
+  const placedRate = totalStudents > 0 ? Math.round((placedStudents / totalStudents) * 100) : 0;
+  const interviewingRate = totalStudents > 0 ? Math.round((interviewingStudents / totalStudents) * 100) : 0;
+  const activeRate = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
+  const upcomingDrives = data?.upcomingDrives || [];
   const recentApps = data?.recentApplications || [];
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
@@ -169,30 +175,30 @@ export default function DashboardTab({ data }: { data?: any }) {
               <div>
                 <div className="flex justify-between text-xs mb-1.5">
                   <span className="text-gray-600 font-medium">Placed</span>
-                  <span className="font-mono font-medium text-gray-900">4/8</span>
+                  <span className="font-mono font-medium text-gray-900">{placedStudents}/{totalStudents}</span>
                 </div>
                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: '50%' }}></div>
+                  <div className="h-full bg-green-500 rounded-full" style={{ width: `${placedRate}%` }}></div>
                 </div>
               </div>
               
               <div>
                 <div className="flex justify-between text-xs mb-1.5">
                   <span className="text-gray-600 font-medium">Interviewing</span>
-                  <span className="font-mono font-medium text-gray-900">2/8</span>
+                  <span className="font-mono font-medium text-gray-900">{interviewingStudents}/{totalStudents}</span>
                 </div>
                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-orange-400 rounded-full" style={{ width: '25%' }}></div>
+                  <div className="h-full bg-orange-400 rounded-full" style={{ width: `${interviewingRate}%` }}></div>
                 </div>
               </div>
               
               <div>
                 <div className="flex justify-between text-xs mb-1.5">
                   <span className="text-gray-600 font-medium">Active</span>
-                  <span className="font-mono font-medium text-gray-900">2/8</span>
+                  <span className="font-mono font-medium text-gray-900">{activeStudents}/{totalStudents}</span>
                 </div>
                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '25%' }}></div>
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${activeRate}%` }}></div>
                 </div>
               </div>
             </div>
@@ -203,31 +209,28 @@ export default function DashboardTab({ data }: { data?: any }) {
             <h3 className="text-base font-bold text-gray-900 mb-5">Upcoming Drives</h3>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#0056b3] text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                    I
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Infosys</p>
-                    <p className="text-xs text-gray-500 font-mono">Mar 15, 2024</p>
-                  </div>
-                </div>
-                <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">5 roles</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#86bc25] text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                    D
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Deloitte</p>
-                    <p className="text-xs text-gray-500 font-mono">Mar 20, 2024</p>
-                  </div>
-                </div>
-                <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">3 roles</span>
-              </div>
+              {upcomingDrives.length === 0 ? (
+                <p className="text-xs text-gray-400 text-center py-4">No upcoming drives posted yet.</p>
+              ) : (
+                upcomingDrives.map((drive: any, i: number) => {
+                  const colors = ["bg-[#0056b3]", "bg-[#86bc25]", "bg-[#7c3aed]", "bg-[#ea580c]"];
+                  const color = colors[i % colors.length];
+                  return (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg ${color} text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0`}>
+                          {(drive.companyName || "C").charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 truncate">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{drive.companyName}</p>
+                          <p className="text-xs text-gray-500 font-mono truncate">{drive.date}</p>
+                        </div>
+                      </div>
+                      <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider shrink-0 ml-2">{drive.roleCount} role{drive.roleCount > 1 ? 's' : ''}</span>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

@@ -4,28 +4,29 @@ export default function AnalyticsTab({ data }: { data?: any }) {
   const placedStudents = data?.placedStudents ?? 0;
   const totalStudents = data?.totalStudents ?? 0;
   const placementRate = totalStudents > 0 ? Math.round((placedStudents / totalStudents) * 100) : 0;
-  const highestPackage = data?.highestPackage ?? "35 LPA";
-  const highestPackageDetail = data?.highestPackageDetail ?? "Google — SE L3";
-  const avgPackage = data?.avgPackage ?? "18.2 LPA";
-  const avgPackageDetail = data?.avgPackageDetail ?? "Across all companies";
+  const highestPackage = data?.highestPackage ?? "N/A";
+  const highestPackageDetail = data?.highestPackageDetail ?? "No CTC recorded yet";
+  const avgPackage = data?.avgPackage ?? "N/A";
+  const avgPackageDetail = data?.avgPackageDetail ?? "No CTC recorded yet";
 
-  const companyPlacements = data?.companyPlacements ?? [
-    { label: 'Amazon', value: 15 },
-    { label: 'Google', value: 12 },
-    { label: 'Microsoft', value: 9 },
-    { label: 'Flipkart', value: 7 },
-    { label: 'Deloitte', value: 8 },
-    { label: 'Infosys', value: 18 },
-  ];
-  const maxCompanyVal = data?.maxCompanyVal ?? 20;
+  const companyPlacements = data?.companyPlacements || [];
+  const maxCompanyVal = data?.maxCompanyVal ?? 10;
+  const departmentDistribution = data?.departmentDistribution || [];
 
-  const departmentDistribution = data?.departmentDistribution ?? [
-    { name: 'B.Sc. CS', count: 32, color: 'bg-blue-600', strokeColor: '#2563eb', strokeDasharray: '93 127', strokeDashoffset: 0 },
-    { name: 'B.C.A.', count: 24, color: 'bg-emerald-500', strokeColor: '#10b981', strokeDasharray: '48 172', strokeDashoffset: -95 },
-    { name: 'M.Sc. CS', count: 18, color: 'bg-amber-500', strokeColor: '#f59e0b', strokeDasharray: '32 188', strokeDashoffset: -145 },
-    { name: 'B.B.A.', count: 14, color: 'bg-violet-500', strokeColor: '#8b5cf6', strokeDasharray: '21 199', strokeDashoffset: -179 },
-    { name: 'Data Sci.', count: 9, color: 'bg-pink-500', strokeColor: '#ec4899', strokeDasharray: '16 204', strokeDashoffset: -202 },
-  ];
+  const monthlyTrend = data?.monthlyTrend || {
+    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+    applications: [0, 0, 0, 0, 0],
+    placements: [0, 0, 0, 0, 0],
+    maxVal: 10
+  };
+
+  const getPoints = (arr: number[]) => {
+    return arr.map((val, i) => {
+      const x = 100 + i * 200;
+      const y = 200 - Math.min(1, Math.max(0, val / (monthlyTrend.maxVal || 1))) * 180;
+      return `${x},${y}`;
+    }).join(' ');
+  };
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300 pb-10">
@@ -116,15 +117,19 @@ export default function AnalyticsTab({ data }: { data?: any }) {
              </div>
              
              {/* Bars */}
-             {companyPlacements.map((company: any, i: number) => (
-                <div key={i} className="relative flex flex-col items-center w-8 sm:w-12 z-10 group cursor-pointer">
-                   <div 
-                      className="w-4 sm:w-6 bg-blue-600 rounded-t-sm transition-all group-hover:bg-blue-500" 
-                      style={{ height: `${Math.min(100, Math.max(8, (company.value / maxCompanyVal) * 100))}%` }}
-                   ></div>
-                   <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap truncate max-w-[60px]" title={company.label}>{company.label}</span>
-                </div>
-             ))}
+             {companyPlacements.length === 0 ? (
+               <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400">No company data yet</div>
+             ) : (
+               companyPlacements.map((company: any, i: number) => (
+                  <div key={i} className="relative flex flex-col items-center w-8 sm:w-12 z-10 group cursor-pointer">
+                     <div 
+                        className="w-4 sm:w-6 bg-blue-600 rounded-t-sm transition-all group-hover:bg-blue-500" 
+                        style={{ height: `${Math.min(100, Math.max(8, (company.value / maxCompanyVal) * 100))}%` }}
+                     ></div>
+                     <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap truncate max-w-[60px]" title={company.label}>{company.label}</span>
+                  </div>
+               ))
+             )}
             </div>
           </div>
         </div>
@@ -133,35 +138,41 @@ export default function AnalyticsTab({ data }: { data?: any }) {
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6">
           <h3 className="text-base font-bold text-gray-900 mb-4 sm:mb-6">Department-wise Distribution</h3>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-16 h-auto sm:h-[250px] py-4 sm:py-0">
-             <div className="relative w-48 h-48">
-                {/* CSS SVG Donut Chart */}
-                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 drop-shadow-sm">
-                   {departmentDistribution.map((dept: any, i: number) => (
-                     <circle 
-                       key={i}
-                       cx="50" 
-                       cy="50" 
-                       r="35" 
-                       fill="transparent" 
-                       stroke={dept.strokeColor} 
-                       strokeWidth="25" 
-                       strokeDasharray={dept.strokeDasharray} 
-                       strokeDashoffset={dept.strokeDashoffset} 
-                     />
-                   ))}
-                </svg>
-             </div>
-             
-             {/* Legend */}
-             <div className="flex flex-col gap-3">
-                {departmentDistribution.map((dept: any, i: number) => (
-                   <div key={i} className="flex items-center gap-3">
-                      <div className={`w-2.5 h-2.5 rounded-full ${dept.color}`}></div>
-                      <span className="text-xs text-gray-600 w-24 truncate" title={dept.name}>{dept.name}</span>
-                      <span className="text-xs font-mono font-bold text-gray-900 ml-auto">{dept.count}</span>
-                   </div>
-                ))}
-             </div>
+             {departmentDistribution.length === 0 ? (
+               <div className="text-xs text-gray-400">No department data yet</div>
+             ) : (
+               <>
+                 <div className="relative w-48 h-48">
+                    {/* CSS SVG Donut Chart */}
+                    <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 drop-shadow-sm">
+                       {departmentDistribution.map((dept: any, i: number) => (
+                         <circle 
+                           key={i}
+                           cx="50" 
+                           cy="50" 
+                           r="35" 
+                           fill="transparent" 
+                           stroke={dept.strokeColor} 
+                           strokeWidth="25" 
+                           strokeDasharray={dept.strokeDasharray} 
+                           strokeDashoffset={dept.strokeDashoffset} 
+                         />
+                       ))}
+                    </svg>
+                 </div>
+                 
+                 {/* Legend */}
+                 <div className="flex flex-col gap-3">
+                    {departmentDistribution.map((dept: any, i: number) => (
+                       <div key={i} className="flex items-center gap-3">
+                          <div className={`w-2.5 h-2.5 rounded-full ${dept.color}`}></div>
+                          <span className="text-xs text-gray-600 w-24 truncate" title={dept.name}>{dept.name}</span>
+                          <span className="text-xs font-mono font-bold text-gray-900 ml-auto">{dept.count}</span>
+                       </div>
+                    ))}
+                 </div>
+               </>
+             )}
           </div>
         </div>
       </div>
@@ -178,10 +189,10 @@ export default function AnalyticsTab({ data }: { data?: any }) {
         <div className="h-[180px] sm:h-[250px] relative w-full flex items-end pl-8 pb-8">
            {/* Y-Axis */}
            <div className="absolute left-0 top-0 bottom-6 w-6 flex flex-col justify-between text-[10px] text-gray-400 font-mono text-right">
-              <span>120</span>
-              <span>90</span>
-              <span>60</span>
-              <span>30</span>
+              <span>{monthlyTrend.maxVal}</span>
+              <span>{Math.round(monthlyTrend.maxVal * 0.75)}</span>
+              <span>{Math.round(monthlyTrend.maxVal * 0.5)}</span>
+              <span>{Math.round(monthlyTrend.maxVal * 0.25)}</span>
               <span>0</span>
            </div>
            
@@ -194,51 +205,26 @@ export default function AnalyticsTab({ data }: { data?: any }) {
            
            {/* X-Axis Labels */}
            <div className="absolute left-8 right-0 bottom-0 flex justify-between text-[10px] text-gray-400 px-4">
-              <span>Oct</span>
-              <span>Nov</span>
-              <span>Dec</span>
-              <span>Jan</span>
-              <span>Feb</span>
+              {monthlyTrend.labels.map((lbl: string, i: number) => (
+                <span key={i}>{lbl}</span>
+              ))}
            </div>
            
            {/* Line Chart Area */}
            <div className="absolute left-8 right-0 top-0 bottom-6">
              <svg viewBox="0 0 1000 200" className="w-full h-full" preserveAspectRatio="none">
-                {/* Applications Trend (Blue) */}
-                <path 
-                   d="M 0 150 Q 250 100 500 80 T 1000 130" 
+                <polyline 
+                   points={getPoints(monthlyTrend.applications)} 
                    fill="none" 
                    stroke="#3b82f6" 
                    strokeWidth="3" 
                 />
-                <path 
-                   d="M 0 150 Q 250 100 500 80 T 1000 130 L 1000 200 L 0 200 Z" 
-                   fill="url(#blue-gradient)" 
-                   opacity="0.1"
-                />
-                {/* Placements Trend (Green) */}
-                <path 
-                   d="M 0 180 Q 250 170 500 160 T 1000 165" 
+                <polyline 
+                   points={getPoints(monthlyTrend.placements)} 
                    fill="none" 
                    stroke="#22c55e" 
                    strokeWidth="3" 
                 />
-                <path 
-                   d="M 0 180 Q 250 170 500 160 T 1000 165 L 1000 200 L 0 200 Z" 
-                   fill="url(#green-gradient)" 
-                   opacity="0.1"
-                />
-
-                <defs>
-                   <linearGradient id="blue-gradient" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="transparent" />
-                   </linearGradient>
-                   <linearGradient id="green-gradient" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#22c55e" />
-                      <stop offset="100%" stopColor="transparent" />
-                   </linearGradient>
-                </defs>
              </svg>
            </div>
         </div>
