@@ -94,14 +94,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
           </div>
           {/* Admin buttons visible on mobile in header row */}
           <div className="flex lg:hidden items-center gap-2">
-            <button
-              className="flex items-center gap-1.5 text-sm font-semibold bg-[#0f9d58] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#0b8043] transition-colors"
-            >
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-              AI JD Parser
-            </button>
+
             <button
               onClick={() => setIsJobFormOpen(true)}
               className="flex items-center gap-1.5 text-sm font-semibold bg-[#2563eb] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#1d4ed8] transition-colors"
@@ -122,8 +115,8 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-800"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-500 hover:text-gray-800"
                   }`}
               >
                 {tab}
@@ -135,121 +128,114 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
         {activeTab === "Dashboard" && <DashboardTab data={dashboardData} />}
         {activeTab === "Analytics" && <AnalyticsTab data={dashboardData} />}
         {activeTab === "Students" && <StudentsTab students={dashboardData?.studentsList || []} onAddStudent={() => setIsAddStudentOpen(true)} />}
-        
+
         {activeTab === "Job Posting" && (
           <div className="flex gap-6">
             {/* Jobs List */}
             <div className="flex-1 min-w-0">
-            {/* Job Cards */}
-            <div className="flex flex-col gap-4">
-              {initialJobs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
-                  <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" className="mb-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <h3 className="text-lg font-bold text-gray-700">Currently jobs are not available</h3>
-                  <p className="text-sm text-gray-500 mt-1">Check back later for new opportunities.</p>
-                </div>
-              ) : (
-                initialJobs.map((job) => (
-                  <Link
-                    key={job.id}
-                    href={`/admin/jobs/${generateJobSlug(job.companyName, job.jobTitle)}`}
-                    className="block bg-white rounded-xl border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer"
-                  >
-                    {/* Card Header */}
-                    <div className="flex items-start justify-between mb-3 sm:mb-4">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-tight">
-                          {job.jobTitle}
-                        </h3>
-                        {job.companyName && (
-                          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{job.companyName}</p>
+              {/* Job Cards */}
+              <div className="flex flex-col gap-4">
+                {initialJobs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
+                    <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" className="mb-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <h3 className="text-lg font-bold text-gray-700">Currently jobs are not available</h3>
+                    <p className="text-sm text-gray-500 mt-1">Check back later for new opportunities.</p>
+                  </div>
+                ) : (
+                  initialJobs.map((job) => (
+                    <Link
+                      key={job.id}
+                      href={`/admin/jobs/${generateJobSlug(job.companyName, job.jobTitle)}`}
+                      className="block bg-white rounded-xl border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      {/* Card Header */}
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-tight">
+                            {job.jobTitle}
+                          </h3>
+                          {job.companyName && (
+                            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{job.companyName}</p>
+                          )}
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 sm:gap-2 shrink-0 ml-3">
+                          <span className="text-xs text-gray-400">
+                            {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                          </span>
+                          <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                            Eligible
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setEditingJob(job);
+                            }}
+                            className="bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold px-3 py-0.5 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm ml-1 flex items-center gap-1"
+                          >
+                            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Card Details */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-4 gap-y-3 mb-3 sm:mb-4">
+                        <div>
+                          <p className="text-[11px] text-gray-400 mb-0.5">Job type</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{job.employmentType}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-400 mb-0.5">Position Type</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{job.positionType}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-400 mb-0.5">Industry</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{job.industry}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-400 mb-0.5">Stipend / Salary</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{job.stipendMonthly ? `INR ${job.stipendMonthly}/mo` : job.ctcFixedLpa ? `${job.ctcFixedLpa} LPA` : 'Unspecified'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-400 mb-0.5">Location</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">
+                            {job.location}
+                          </p>
+                        </div>
+                        {job.jobFunction && (
+                          <div>
+                            <p className="text-[11px] text-gray-400 mb-0.5">Job Function(s)</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-800">{job.jobFunction}</p>
+                          </div>
                         )}
                       </div>
-                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 sm:gap-2 shrink-0 ml-3">
-                        <span className="text-xs text-gray-400">
-                          {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
-                        </span>
-                        <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
-                          Eligible
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setEditingJob(job);
-                          }}
-                          className="bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold px-3 py-0.5 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm ml-1 flex items-center gap-1"
-                        >
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          Edit
-                        </button>
-                      </div>
-                    </div>
 
-                  {/* Card Details */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-4 gap-y-3 mb-3 sm:mb-4">
-                    <div>
-                      <p className="text-[11px] text-gray-400 mb-0.5">Job type</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-800">{job.employmentType}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-gray-400 mb-0.5">Position Type</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-800">{job.positionType}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-gray-400 mb-0.5">Industry</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-800">{job.industry}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-gray-400 mb-0.5">Stipend / Salary</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-800">{job.stipendMonthly ? `INR ${job.stipendMonthly}/mo` : job.ctcFixedLpa ? `${job.ctcFixedLpa} LPA` : 'Unspecified'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-gray-400 mb-0.5">Location</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-800">
-                        {job.location}
-                      </p>
-                    </div>
-                    {job.jobFunction && (
-                      <div>
-                        <p className="text-[11px] text-gray-400 mb-0.5">Job Function(s)</p>
-                        <p className="text-xs sm:text-sm font-medium text-gray-800">{job.jobFunction}</p>
+                      {/* Card Footer */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                          {job.status || "Open"}
+                        </span>
+                        <span className="text-xs sm:text-sm text-blue-600 font-medium hover:text-blue-900 transition-colors flex items-center gap-1">
+                          View details
+                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Card Footer */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
-                      {job.status || "Open"}
-                    </span>
-                    <span className="text-xs sm:text-sm text-blue-600 font-medium hover:text-blue-900 transition-colors flex items-center gap-1">
-                      View details
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    </span>
-                  </div>
-                </Link>
-              ))
-            )}
+                    </Link>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Right Sidebar — desktop only */}
-          <aside className="w-[260px] shrink-0 hidden lg:flex flex-col gap-5">
+            {/* Right Sidebar — desktop only */}
+            <aside className="w-[260px] shrink-0 hidden lg:flex flex-col gap-5">
               <div className="flex flex-row gap-2 w-full">
-                <button 
-                  className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#0f9d58] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#0b8043] transition-colors"
-                >
-                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
-                  AI JD Parser
-                </button>
-                <button 
+
+                <button
                   onClick={() => setIsJobFormOpen(true)}
                   className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#2563eb] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#1d4ed8] transition-colors"
                 >
@@ -260,37 +246,37 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                 </button>
               </div>
 
-            {/* Popular Tags */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#F59E0B"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#F59E0B" /></svg>
-                <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Popular Tags</h2>
+              {/* Popular Tags */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#F59E0B"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#F59E0B" /></svg>
+                  <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Popular Tags</h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {POPULAR_TAGS.map((tag) => (
+                    <button
+                      key={tag}
+                      className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Offer CTA */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <p className="text-sm font-semibold text-gray-800 leading-snug">
-                Have you received any offer directly ?
-              </p>
-              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                Please provide the offer details for the TPOs records and approval
-              </p>
-              <button className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-900 transition-colors flex items-center gap-1">
-                <span className="text-lg leading-none">+</span> Create Offer
-              </button>
-            </div>
-          </aside>
+              {/* Offer CTA */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <p className="text-sm font-semibold text-gray-800 leading-snug">
+                  Have you received any offer directly ?
+                </p>
+                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                  Please provide the offer details for the TPOs records and approval
+                </p>
+                <button className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-900 transition-colors flex items-center gap-1">
+                  <span className="text-lg leading-none">+</span> Create Offer
+                </button>
+              </div>
+            </aside>
           </div>
         )}
       </main>
