@@ -54,8 +54,8 @@ export default function AnalyticsTab({ data }: { data?: any }) {
 
         {/* Placement Rate */}
         <div className="bg-white p-5 rounded-lg border border-gray-200 flex items-start gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#3b82f6">
+          <div className="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#ef4444">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
@@ -123,7 +123,7 @@ export default function AnalyticsTab({ data }: { data?: any }) {
                companyPlacements.map((company: any, i: number) => (
                   <div key={i} className="relative flex flex-col items-center w-8 sm:w-12 z-10 group cursor-pointer">
                      <div 
-                        className="w-4 sm:w-6 bg-blue-600 rounded-t-sm transition-all group-hover:bg-blue-500" 
+                        className="w-4 sm:w-6 bg-[#2563EB] rounded-t-sm transition-all group-hover:bg-blue-500" 
                         style={{ height: `${Math.min(100, Math.max(8, (company.value / maxCompanyVal) * 100))}%` }}
                      ></div>
                      <span className="absolute -bottom-6 text-[10px] sm:text-xs text-gray-500 whitespace-nowrap truncate max-w-[60px]" title={company.label}>{company.label}</span>
@@ -182,7 +182,7 @@ export default function AnalyticsTab({ data }: { data?: any }) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
           <h3 className="text-base font-bold text-gray-900">Monthly Applications vs Placements Trend</h3>
           <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block bg-blue-500 rounded"></span>Applications</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block bg-red-500 rounded"></span>Applications</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block bg-green-500 rounded"></span>Placements</span>
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function AnalyticsTab({ data }: { data?: any }) {
                 <polyline 
                    points={getPoints(monthlyTrend.applications)} 
                    fill="none" 
-                   stroke="#3b82f6" 
+                   stroke="#ef4444" 
                    strokeWidth="3" 
                 />
                 <polyline 

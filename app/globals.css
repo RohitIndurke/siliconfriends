@@ -1,13 +1,32 @@
+@import url("https://db.onlinewebfonts.com/c/7229e4b36b2eece28cd28b95c2c9ffa8?family=Medino");
 @import "tailwindcss";
-@import "../node_modules/@heroui/styles/dist/index.css";
+@import "@heroui/styles";
+
+@font-face {
+  font-family: "Medino";
+  src: url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.eot");
+  src: url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.eot?#iefix") format("embedded-opentype"),
+       url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.woff2") format("woff2"),
+       url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.woff") format("woff"),
+       url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.ttf") format("truetype"),
+       url("https://db.onlinewebfonts.com/t/7229e4b36b2eece28cd28b95c2c9ffa8.svg#Medino") format("svg");
+}
+
+.font-medino {
+  font-family: "Medino", Georgia, serif !important;
+}
 
 @source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --primary: #2563EB;
+  --navy: #172554;
+  --light-blue: #EFF6FF;
+  --success: #16A34A;
 }
 
 @theme inline {
@@ -19,15 +38,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #F8FAFC;
+    --foreground: #0F172A;
   }
 }
 
 html,
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #F8FAFC;
+  color: #0F172A;
   font-family: Arial, Helvetica, sans-serif;
   -ms-overflow-style: none;
   scrollbar-width: none;

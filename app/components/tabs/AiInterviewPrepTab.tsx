@@ -115,6 +115,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   // Step 1 state
   const [selectedJob, setSelectedJob] = useState("");
+  const [jdMode, setJdMode] = useState<"select" | "paste">("select");
+  const [customJd, setCustomJd] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -205,7 +207,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
       return;
     }
 
-    if (!selectedJob) { toast.error("Please select a job."); return; }
+    const hasJobInput = jdMode === "select" ? !!selectedJob : customJd.trim().length > 20;
+    if (!hasJobInput) { toast.error(jdMode === "select" ? "Please select a job." : "Please paste a job description (minimum 20 characters)."); return; }
     if (selectedCategories.length === 0) { toast.error("Select at least one question category."); return; }
 
     const limitCheck = await checkInterviewRateLimit();
@@ -218,7 +221,11 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
     setStep(2);
 
     const fd = new FormData();
-    fd.append("jobId", selectedJob);
+    if (jdMode === "select") {
+      fd.append("jobId", selectedJob);
+    } else {
+      fd.append("customJobDescription", customJd.trim());
+    }
     fd.append("categories", JSON.stringify(selectedCategories));
     fd.append("forceRegenerate", String(forceRegenerate));
 
@@ -344,38 +351,97 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             {/* Section 1 — Job */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-full bg-[#2563eb] text-white text-xs font-bold flex items-center justify-center">1</div>
-                <h3 className="font-semibold text-gray-900">Select Target Job</h3>
+                <div className="w-6 h-6 rounded-full bg-[#2563EB] text-white text-xs font-bold flex items-center justify-center">1</div>
+                <h3 className="font-semibold text-[#0F172A]">Target Job</h3>
               </div>
-              <div className="relative">
-                <select
-                  id="interview-job-select"
-                  className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm text-[#4b5563] focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] focus:outline-none appearance-none cursor-pointer transition-shadow"
-                  value={selectedJob}
-                  onChange={(e) => setSelectedJob(e.target.value)}
+
+              {/* Mode Toggle */}
+              <div className="flex rounded-lg bg-[#f3f4f6] p-1 mb-4">
+                <button
+                  onClick={() => setJdMode("select")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-all duration-200 ${jdMode === "select"
+                    ? "bg-white text-[#0F172A] shadow-sm"
+                    : "text-[#6b7280] hover:text-[#374151]"
+                    }`}
                 >
-                  <option value="" disabled>— Select a role —</option>
-                  {jobs.map((job) => (
-                    <option key={job.id} value={job.id}>
-                      {job.jobTitle} @ {job.companyName}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                </div>
+                  Select a Job
+                </button>
+                <button
+                  onClick={() => setJdMode("paste")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-all duration-200 ${jdMode === "paste"
+                    ? "bg-white text-[#0F172A] shadow-sm"
+                    : "text-[#6b7280] hover:text-[#374151]"
+                    }`}
+                >
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Paste JD
+                </button>
               </div>
-              {activeJob && (
-                <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-100 text-sm text-blue-800">
-                  <p className="font-semibold">{activeJob.jobTitle}</p>
-                  <p className="text-xs text-blue-600 mt-0.5">{activeJob.companyName} · {activeJob.industry} · {activeJob.employmentType}</p>
-                  {activeJob.requiredSkills && (
-                    <p className="text-xs text-blue-700 mt-1.5 line-clamp-2">
-                      <span className="font-semibold">Required:</span> {activeJob.requiredSkills}
-                    </p>
+
+              {/* Select Mode */}
+              {jdMode === "select" && (
+                <div className="animate-in fade-in duration-200">
+                  <div className="relative">
+                    <select
+                      id="interview-job-select"
+                      className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm text-[#4b5563] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none appearance-none cursor-pointer transition-shadow"
+                      value={selectedJob}
+                      onChange={(e) => setSelectedJob(e.target.value)}
+                    >
+                      <option value="" disabled>— Select a role —</option>
+                      {jobs.map((job) => (
+                        <option key={job.id} value={job.id}>
+                          {job.jobTitle} @ {job.companyName}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {jobs.length === 0 && (
+                    <p className="text-xs text-amber-600 mt-2">No job postings available. Try pasting a JD instead.</p>
                   )}
+                  {activeJob && (
+                    <div className="mt-3 p-3 rounded-lg bg-[#EFF6FF] border border-blue-100 text-sm text-[#172554]">
+                      <p className="font-semibold">{activeJob.jobTitle}</p>
+                      <p className="text-xs text-[#2563EB] mt-0.5">{activeJob.companyName} · {activeJob.industry} · {activeJob.employmentType}</p>
+                      {activeJob.requiredSkills && (
+                        <p className="text-xs text-[#172554] mt-1.5 line-clamp-2">
+                          <span className="font-semibold">Required:</span> {activeJob.requiredSkills}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Paste Mode */}
+              {jdMode === "paste" && (
+                <div className="animate-in fade-in duration-200">
+                  <textarea
+                    value={customJd}
+                    onChange={(e) => setCustomJd(e.target.value)}
+                    placeholder={"Paste the full job description here...\n\nExample:\nSoftware Engineer at TechCorp\n\nResponsibilities:\n- Build and maintain web applications\n- Collaborate with cross-functional teams\n\nRequirements:\n- 3+ years of experience with React/Next.js\n- Strong TypeScript skills"}
+                    className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-[#4b5563] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none transition-shadow resize-none h-40 leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between mt-1.5">
+                    <p className="text-xs text-[#9ca3af]">
+                      {customJd.trim().length > 0
+                        ? `${customJd.trim().length} characters`
+                        : "Minimum 20 characters"}
+                    </p>
+                    {customJd.trim().length > 0 && customJd.trim().length <= 20 && (
+                      <p className="text-xs text-amber-600">Please paste a more detailed description</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -383,8 +449,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             {/* Section 2 — Categories */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-6 h-6 rounded-full bg-[#2563eb] text-white text-xs font-bold flex items-center justify-center">2</div>
-                <h3 className="font-semibold text-gray-900">Question Categories</h3>
+                <div className="w-6 h-6 rounded-full bg-[#2563EB] text-white text-xs font-bold flex items-center justify-center">2</div>
+                <h3 className="font-semibold text-[#0F172A]">Question Categories</h3>
               </div>
               <p className="text-xs text-gray-500 mb-4 ml-8">Select topics you want to be tested on</p>
               <div className="flex flex-wrap gap-2.5">
@@ -397,8 +463,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                     }
                   }}
                   className={`relative flex items-center rounded-lg border px-3 py-2 text-left transition-all ${selectedCategories.length === CATEGORIES.length
-                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                    : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
+                    ? "bg-[#2563EB] text-white border-[#2563EB] shadow-sm"
+                    : "bg-[#EFF6FF] border-blue-100 hover:border-blue-300 hover:bg-blue-100"
                     }`}
                 >
                   <div className="flex items-center gap-1.5">
@@ -414,12 +480,12 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                       id={`category-${cat.id.replace(/\s+/g, "-").toLowerCase()}`}
                       onClick={() => toggleCategory(cat.id)}
                       className={`relative flex items-center rounded-lg border px-3 py-2 text-left transition-all ${isSelected
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-blue-50 border-blue-100 hover:border-blue-300 hover:bg-blue-100"
+                        ? "bg-[#2563EB] text-white border-[#2563EB] shadow-sm"
+                        : "bg-[#EFF6FF] border-blue-100 hover:border-blue-300 hover:bg-blue-100"
                         }`}
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className={isSelected ? "text-white" : "text-blue-500"}>{cat.icon}</span>
+                        <span className={isSelected ? "text-white" : "text-[#2563EB]"}>{cat.icon}</span>
                         <span className={`text-xs font-semibold ${isSelected ? "text-white" : "text-gray-800"}`}>{cat.label}</span>
                         {isSelected && (
                           <svg className="ml-auto w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -432,7 +498,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                 })}
               </div>
               {selectedCategories.length > 0 && (
-                <p className="text-xs text-[#2563eb] font-medium mt-3">
+                <p className="text-xs text-[#2563EB] font-medium mt-3">
                   {selectedCategories.length} categor{selectedCategories.length === 1 ? "y" : "ies"} selected
                 </p>
               )}
@@ -441,8 +507,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             {/* Section 3 — Resume */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-6 h-6 rounded-full bg-[#2563eb] text-white text-xs font-bold flex items-center justify-center">3</div>
-                <h3 className="font-semibold text-gray-900">Your Resume</h3>
+                <div className="w-6 h-6 rounded-full bg-[#2563EB] text-white text-xs font-bold flex items-center justify-center">3</div>
+                <h3 className="font-semibold text-[#0F172A]">Your Resume</h3>
                 <span className="text-xs text-gray-400 font-normal">(optional — adds 5 personalized questions)</span>
               </div>
 
@@ -453,11 +519,11 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                     onDragLeave={() => setIsDragging(false)}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-5 cursor-pointer transition-colors ${isDragging ? "border-[#2563eb] bg-blue-50" : "border-gray-200 bg-gray-50 hover:border-[#2563eb] hover:bg-blue-50"
+                    className={`relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-5 cursor-pointer transition-colors ${isDragging ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200 bg-gray-50 hover:border-[#2563EB] hover:bg-[#EFF6FF]"
                       }`}
                   >
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${isDragging ? "bg-blue-100" : "bg-white border border-gray-200"}`}>
-                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={isDragging ? "#2563eb" : "#9ca3af"} strokeWidth="2">
+                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={isDragging ? "#2563EB" : "#9ca3af"} strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
                     </div>
@@ -512,7 +578,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                           key={r.id}
                           onClick={() => handleUseRecentResume(r.id)}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all text-sm ${selectedResumeId === r.id
-                            ? "border-[#2563eb] bg-blue-50 text-[#2563eb]"
+                            ? "border-[#2563EB] bg-[#EFF6FF] text-[#2563EB]"
                             : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
                             }`}
                         >
@@ -549,8 +615,8 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </span>
-                  <span className={activeJob ? "text-gray-900 font-medium" : "text-gray-400"}>
-                    {activeJob ? `${activeJob.jobTitle} @ ${activeJob.companyName}` : "No job selected"}
+                  <span className={activeJob || (jdMode === "paste" && customJd.trim().length > 20) ? "text-gray-900 font-medium" : "text-gray-400"}>
+                    {activeJob ? `${activeJob.jobTitle} @ ${activeJob.companyName}` : jdMode === "paste" && customJd.trim().length > 20 ? `Custom JD (${customJd.trim().length} chars)` : "No job selected"}
                   </span>
                 </div>
 
@@ -582,9 +648,9 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
                 <button
                   id="interview-generate-btn"
                   onClick={() => handleGenerate(false)}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all shadow-sm ${!selectedJob || selectedCategories.length === 0 || rateLimitInfo.limited
+                  className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all shadow-sm ${(jdMode === "select" ? !selectedJob : customJd.trim().length <= 20) || selectedCategories.length === 0 || rateLimitInfo.limited
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-[#a855f7] hover:bg-[#9333ea] text-white"
+                      : "bg-[#2563EB] hover:bg-[#172554] text-white"
                     }`}
                 >
                   <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -646,7 +712,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             <h2 className="text-2xl font-bold text-[#111827]">Your Interview Questions</h2>
           </div>
           <p className="text-sm text-gray-500">
-            {questions.length} questions · {activeJob?.jobTitle} @ {activeJob?.companyName}
+            {questions.length} questions · {activeJob ? `${activeJob.jobTitle} @ ${activeJob.companyName}` : jdMode === "paste" && customJd.trim() ? `Custom JD: "${customJd.trim().substring(0, 50)}${customJd.trim().length > 50 ? '...' : ''}"` : "Selected Role"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -655,7 +721,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             <button
               id="view-mode-cards"
               onClick={() => setViewMode("cards")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${viewMode === "cards" ? "bg-[#2563eb] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${viewMode === "cards" ? "bg-[#2563EB] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
             >
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -666,7 +732,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
             <button
               id="view-mode-list"
               onClick={() => setViewMode("list")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors border-l border-gray-200 ${viewMode === "list" ? "bg-[#2563eb] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors border-l border-gray-200 ${viewMode === "list" ? "bg-[#2563EB] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
             >
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -709,7 +775,7 @@ export default function AiInterviewPrepTab({ jobs = [] }: { jobs?: any[] }) {
               setExpandedIdx(null);
             }}
             className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${filterCategory === cat
-              ? "bg-[#2563eb] text-white border-[#2563eb]"
+              ? "bg-[#2563EB] text-white border-[#2563EB]"
               : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               }`}
           >

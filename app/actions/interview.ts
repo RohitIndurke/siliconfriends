@@ -46,13 +46,17 @@ export async function generateInterviewQuestions(
     }
     const userId = session.user.id;
 
-    const jobId = formData.get("jobId") as string;
+    const jobId = formData.get("jobId") as string | null;
+    const customJobDescription = formData.get("customJobDescription") as string | null;
     const categoriesRaw = formData.get("categories") as string;
     const resumeId = formData.get("resumeId") as string | null;
     const file = formData.get("resume") as File | null;
     const forceRegenerate = formData.get("forceRegenerate") === "true";
 
-    if (!jobId) return { error: "No job selected." };
+    if (!jobId && !customJobDescription?.trim()) return { error: "No job selected and no job description provided." };
+
+    // When a custom JD is pasted, generate a stable ID from its content for caching
+    const effectiveJobId = jobId || `custom-${crypto.createHash("md5").update(customJobDescription!.trim()).digest("hex").substring(0, 12)}`;
     if (!categoriesRaw) return { error: "No categories selected." };
 
     const categories: string[] = JSON.parse(categoriesRaw);
@@ -66,7 +70,7 @@ export async function generateInterviewQuestions(
         .where(
           and(
             eq(interviewSession.userId, userId),
-            eq(interviewSession.jobId, jobId)
+            eq(interviewSession.jobId, effectiveJobId)
           )
         )
         .orderBy(desc(interviewSession.createdAt))
@@ -108,15 +112,19 @@ export async function generateInterviewQuestions(
     }
 
     // ── 2. Load job details ───────────────────────────────────────────────────
-    const jobRecord = await db
-      .select()
-      .from(job)
-      .where(eq(job.id, jobId))
-      .get();
+    let jobDescription = "";
+    if (customJobDescription?.trim()) {
+      jobDescription = customJobDescription.trim();
+    } else if (jobId) {
+      const jobRecord = await db
+        .select()
+        .from(job)
+        .where(eq(job.id, jobId))
+        .get();
 
-    if (!jobRecord) return { error: "Selected job not found." };
+      if (!jobRecord) return { error: "Selected job not found." };
 
-    const jobDescription = `
+      jobDescription = `
 Job Title: ${jobRecord.jobTitle}
 Company: ${jobRecord.companyName}
 Industry: ${jobRecord.industry}
@@ -126,7 +134,8 @@ Description: ${jobRecord.description}
 Required Skills: ${jobRecord.requiredSkills}
 Good-to-have Skills: ${jobRecord.goodToHaveSkills}
 Selection Process: ${jobRecord.selectionProcess}
-    `.trim();
+      `.trim();
+    }
 
     // ── 3. Load / parse resume ────────────────────────────────────────────────
     let resumeText = "";
@@ -204,7 +213,7 @@ Selection Process: ${jobRecord.selectionProcess}
     const poolQuestions = await db.select().from(interviewQuestionBank).where(
       or(
         inArray(interviewQuestionBank.category, categories),
-        eq(interviewQuestionBank.jobId, jobId)
+        eq(interviewQuestionBank.jobId, effectiveJobId)
       )
     );
     const unseenPoolQuestions = poolQuestions.filter(q => !seenQuestions.has(q.question));
@@ -323,7 +332,7 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
       if (newPoolQuestions.length > 0) {
         const bankInserts = newPoolQuestions.map(q => ({
           id: crypto.randomUUID(),
-          jobId: q.source === "position" ? jobId : null,
+          jobId: q.source === "position" ? effectiveJobId : null,
           category: q.category,
           question: q.question,
           answer: q.answer,
@@ -341,7 +350,7 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
       await db.insert(interviewSession).values({
         id: crypto.randomUUID(),
         userId,
-        jobId,
+        jobId: effectiveJobId,
         categories,
         questions: finalQuestions,
         createdAt: new Date(),
@@ -358,7 +367,7 @@ RESPOND ONLY with a valid JSON object in this exact format (no markdown, no code
         .where(
           and(
             eq(interviewSession.userId, userId),
-            eq(interviewSession.jobId, jobId)
+            eq(interviewSession.jobId, effectiveJobId)
           )
         )
         .orderBy(desc(interviewSession.createdAt))

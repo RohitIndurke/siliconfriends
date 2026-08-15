@@ -65,14 +65,11 @@ export default function JobDetailClient({ job }: { job: any }) {
          <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
             <div className="mx-auto max-w-[1300px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
                <div className="flex items-center gap-3">
-                  <Image
-                     src="/logo.png"
-                     alt="MIT Arts Commerce & Science College"
-                     width={180}
-                     height={48}
-                     className="h-8 sm:h-10 w-auto object-contain"
-                     priority
-                  />
+                  <span className="text-lg sm:text-xl font-bold tracking-tight select-none flex items-center">
+                     <span className="font-medino text-[#2563EB] font-medium text-3xl sm:text-4xl leading-none">sf</span>
+                     <span className="text-gray-300 mx-1.5 font-light">|</span>
+                     <span className="text-[#0F172A]">SiliconFriends</span>
+                  </span>
                </div>
                <div className="flex items-center gap-5">
                   {session ? (
@@ -279,7 +276,7 @@ export default function JobDetailClient({ job }: { job: any }) {
                               href={job.externalApplyLink || job.website}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-blue-600 hover:underline"
+                              className="text-red-600 hover:underline"
                            >
                               {job.externalApplyLink || job.website}
                            </a>

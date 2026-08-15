@@ -46,9 +46,9 @@ export default function MyApplicationsTab() {
             if (status === "Rejected") {
               circleColor = "bg-gray-100 border-gray-300 text-gray-400";
             } else if (isCompleted) {
-              circleColor = "bg-blue-600 border-blue-600 text-white";
+              circleColor = "bg-[#2563EB] border-[#2563EB] text-white";
             } else if (isCurrent) {
-              circleColor = "bg-blue-600 border-blue-600 text-white ring-4 ring-blue-100";
+              circleColor = "bg-[#2563EB] border-[#2563EB] text-white ring-4 ring-blue-100";
             }
 
             return (
@@ -63,7 +63,7 @@ export default function MyApplicationsTab() {
                   )}
                 </div>
                 <span className={`absolute top-8 text-[11px] font-semibold whitespace-nowrap ${
-                  isCurrent ? "text-blue-600 font-bold" : isCompleted ? "text-gray-800" : "text-gray-400"
+                  isCurrent ? "text-[#2563EB] font-bold" : isCompleted ? "text-gray-800" : "text-gray-400"
                 }`}>
                   {stepName}
                 </span>
@@ -84,7 +84,7 @@ export default function MyApplicationsTab() {
     <div className="flex flex-col gap-6 animate-in fade-in duration-300 pb-10 max-w-5xl">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-[#111827]">My Applications</h2>
+        <h2 className="text-xl font-bold text-[#0F172A]">My Applications</h2>
         <p className="text-sm text-[#6b7280] mt-1">{applications.length} applications tracked</p>
       </div>
 
@@ -99,7 +99,7 @@ export default function MyApplicationsTab() {
               onClick={() => setActiveFilter(filterName)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 isActive
-                  ? 'bg-[#2563eb] text-white shadow-sm'
+                  ? 'bg-[#2563EB] text-white shadow-sm'
                   : 'bg-white text-[#4b5563] border border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -112,7 +112,7 @@ export default function MyApplicationsTab() {
       {/* Applications List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-8 w-8 text-[#2563EB]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -124,8 +124,8 @@ export default function MyApplicationsTab() {
       ) : (
         <div className="flex flex-col gap-6">
           {filteredApps.map((app) => {
-            let statusColor = "text-blue-700 bg-blue-100";
-            if (app.status === "Selected") statusColor = "text-green-700 bg-green-100";
+            let statusColor = "text-[#2563EB] bg-[#EFF6FF]";
+            if (app.status === "Selected") statusColor = "text-[#16A34A] bg-green-100";
             else if (app.status === "Shortlisted") statusColor = "text-amber-700 bg-amber-100";
             else if (app.status === "Rejected") statusColor = "text-red-700 bg-red-100";
 

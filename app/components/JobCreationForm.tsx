@@ -180,29 +180,29 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="text-xs font-semibold text-gray-600">Job Title</label>
-                                <input type="text" name="jobTitle" value={formData.jobTitle} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" required />
+                                <input type="text" name="jobTitle" value={formData.jobTitle} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" required />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Employment Type</label>
-                                <select name="employmentType" value={formData.employmentType} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition cursor-pointer">
+                                <select name="employmentType" value={formData.employmentType} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition cursor-pointer">
                                     <option value="Internship">Internship</option>
                                     <option value="Placement">Placement</option>
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Position Type</label>
-                                <select name="positionType" value={formData.positionType} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition cursor-pointer">
+                                <select name="positionType" value={formData.positionType} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition cursor-pointer">
                                     <option value="Technical">Technical</option>
                                     <option value="Non-Technical">Non-Technical</option>
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Location</label>
-                                <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. Hyderabad" />
+                                <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. Hyderabad" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Duration</label>
-                                <select name="duration" value={formData.duration} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition cursor-pointer">
+                                <select name="duration" value={formData.duration} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition cursor-pointer">
                                     <option value="2 Months">2 Months</option>
                                     <option value="3 Months">3 Months</option>
                                     <option value="6 Months">6 Months</option>
@@ -211,7 +211,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                             </div>
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="text-xs font-semibold text-gray-600">Job Function(s)</label>
-                                <input type="text" name="jobFunction" value={formData.jobFunction} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. Non Technical" />
+                                <input type="text" name="jobFunction" value={formData.jobFunction} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. Non Technical" />
                             </div>
                         </div>
                     </div>
@@ -224,35 +224,35 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Company Name</label>
-                                <input type="text" name="companyName" value={formData.companyName} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" required />
+                                <input type="text" name="companyName" value={formData.companyName} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" required />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Company Logo (Text Initials)</label>
-                                <input type="text" name="companyLogo" value={formData.companyLogo} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. SI" />
+                                <input type="text" name="companyLogo" value={formData.companyLogo} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. SI" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Industry</label>
-                                <input type="text" name="industry" value={formData.industry} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. EdTech" />
+                                <input type="text" name="industry" value={formData.industry} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. EdTech" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Founded Year</label>
-                                <input type="number" name="foundedYear" value={formData.foundedYear} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="number" name="foundedYear" value={formData.foundedYear} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Organization Size</label>
-                                <input type="text" name="organizationSize" value={formData.organizationSize} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. 51-200" />
+                                <input type="text" name="organizationSize" value={formData.organizationSize} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. 51-200" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Base Location</label>
-                                <input type="text" name="baseLocation" value={formData.baseLocation} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="text" name="baseLocation" value={formData.baseLocation} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="text-xs font-semibold text-gray-600">Website</label>
-                                <input type="url" name="website" value={formData.website} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="url" name="website" value={formData.website} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="text-xs font-semibold text-gray-600">Contact Person</label>
-                                <input type="text" name="contactPerson" value={formData.contactPerson} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="text" name="contactPerson" value={formData.contactPerson} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                         </div>
                     </div>
@@ -265,11 +265,11 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Stipend Monthly (INR)</label>
-                                <input type="number" name="stipendMonthly" value={formData.stipendMonthly} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="number" name="stipendMonthly" value={formData.stipendMonthly} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Max Incentives Monthly (INR)</label>
-                                <input type="number" name="maxIncentivesMonthly" value={formData.maxIncentivesMonthly} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="number" name="maxIncentivesMonthly" value={formData.maxIncentivesMonthly} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
@@ -279,11 +279,11 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">CTC Fixed (LPA)</label>
-                                <input type="number" step="0.1" name="ctcFixedLpa" value={formData.ctcFixedLpa} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="number" step="0.1" name="ctcFixedLpa" value={formData.ctcFixedLpa} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">CTC Variable (LPA)</label>
-                                <input type="number" step="0.1" name="ctcVariableLpa" value={formData.ctcVariableLpa} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="number" step="0.1" name="ctcVariableLpa" value={formData.ctcVariableLpa} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                         </div>
                     </div>
@@ -296,11 +296,11 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Required Skills (Comma separated)</label>
-                                <input type="text" name="requiredSkills" value={formData.requiredSkills} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="text" name="requiredSkills" value={formData.requiredSkills} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Good To Have Skills (Comma separated)</label>
-                                <input type="text" name="goodToHaveSkills" value={formData.goodToHaveSkills} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="text" name="goodToHaveSkills" value={formData.goodToHaveSkills} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                         </div>
                     </div>
@@ -313,11 +313,11 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Main Description</label>
-                                <textarea name="description" rows={4} value={formData.description} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition leading-relaxed" required></textarea>
+                                <textarea name="description" rows={4} value={formData.description} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition leading-relaxed" required></textarea>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Other Details</label>
-                                <textarea name="otherDetails" rows={3} value={formData.otherDetails} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition leading-relaxed"></textarea>
+                                <textarea name="otherDetails" rows={3} value={formData.otherDetails} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition leading-relaxed"></textarea>
                             </div>
                         </div>
                     </div>
@@ -330,7 +330,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Eligibility Summary</label>
-                                <input type="text" name="eligibilitySummary" value={formData.eligibilitySummary} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. All Interested U.G AND P.G." />
+                                <input type="text" name="eligibilitySummary" value={formData.eligibilitySummary} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. All Interested U.G AND P.G." />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Eligible Courses (Select all that apply)</label>
@@ -355,7 +355,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Selection Process (Comma separated stages)</label>
-                                <input type="text" name="selectionProcess" value={formData.selectionProcess} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="text" name="selectionProcess" value={formData.selectionProcess} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                         </div>
                     </div>
@@ -368,7 +368,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Status</label>
-                                <input type="text" name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" placeholder="e.g. Eligible / Open" />
+                                <input type="text" name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" placeholder="e.g. Eligible / Open" />
                             </div>
                             <div className="flex flex-col justify-center">
                                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
@@ -378,15 +378,15 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Opens At</label>
-                                <input type="datetime-local" name="opensAt" value={formData.opensAt} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="datetime-local" name="opensAt" value={formData.opensAt} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-semibold text-gray-600">Closes At</label>
-                                <input type="datetime-local" name="closesAt" value={formData.closesAt} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="datetime-local" name="closesAt" value={formData.closesAt} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                             <div className="flex flex-col gap-1.5 md:col-span-2">
                                 <label className="text-xs font-semibold text-gray-600">External Apply Link</label>
-                                <input type="url" name="externalApplyLink" value={formData.externalApplyLink} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition" />
+                                <input type="url" name="externalApplyLink" value={formData.externalApplyLink} onChange={handleInputChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] transition" />
                             </div>
                         </div>
                     </div>
@@ -396,7 +396,7 @@ export const JobCreationForm: React.FC<JobCreationFormProps> = ({ onClose, initi
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="bg-purple-700 hover:bg-purple-800 text-white font-medium px-8 py-3 rounded-lg shadow-sm transition-colors"
+                            className="bg-[#2563EB] hover:bg-[#172554] text-white font-medium px-8 py-3 rounded-lg shadow-sm transition-colors"
                         >
                             {isSubmitting ? (initialData?.id ? "Updating..." : "Creating...") : (initialData?.id ? "Update Job Profile" : "Create Job Profile")}
                         </button>

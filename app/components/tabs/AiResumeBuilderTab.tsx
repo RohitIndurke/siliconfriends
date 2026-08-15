@@ -31,6 +31,8 @@ const parseSocials = (socials?: any): string[] => {
 export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
   const [step, setStep] = useState(1);
   const [selectedJob, setSelectedJob] = useState("");
+  const [jdMode, setJdMode] = useState<"select" | "paste">("select");
+  const [customJd, setCustomJd] = useState("");
 
   const activeJob = jobs.find(j => j.id === selectedJob);
   const jobRequirements = activeJob ? [
@@ -38,6 +40,19 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
     activeJob.goodToHaveSkills,
     activeJob.description?.substring(0, 100) + "..."
   ].filter(Boolean) : MOCK_JOB_REQUIREMENTS;
+
+  // Derive the job description text used for AI analysis
+  const getJobDescriptionText = () => {
+    if (jdMode === "paste" && customJd.trim()) {
+      return customJd.trim();
+    }
+    if (activeJob) {
+      return `${activeJob.jobTitle} at ${activeJob.companyName}. Description: ${activeJob.description}. Required Skills: ${activeJob.requiredSkills}. Good to have: ${activeJob.goodToHaveSkills}`;
+    }
+    return MOCK_JOB_REQUIREMENTS.join(", ");
+  };
+
+  const canProceedStep1 = jdMode === "select" ? !!selectedJob : customJd.trim().length > 20;
 
   // Step 2 State
   const [isDragging, setIsDragging] = useState(false);
@@ -165,11 +180,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       const formData = new FormData();
       formData.append("resume", file);
 
-      const jobDesc = activeJob
-        ? `${activeJob.jobTitle} at ${activeJob.companyName}. Description: ${activeJob.description}. Required Skills: ${activeJob.requiredSkills}. Good to have: ${activeJob.goodToHaveSkills}`
-        : MOCK_JOB_REQUIREMENTS.join(", ");
-
-      formData.append("jobDescription", jobDesc);
+      formData.append("jobDescription", getJobDescriptionText());
 
       const result = await parseResumeAndCompare(formData);
 
@@ -224,11 +235,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       const formData = new FormData();
       formData.append("resumeId", resumeId);
 
-      const jobDesc = activeJob
-        ? `${activeJob.jobTitle} at ${activeJob.companyName}. Description: ${activeJob.description}. Required Skills: ${activeJob.requiredSkills}. Good to have: ${activeJob.goodToHaveSkills}`
-        : MOCK_JOB_REQUIREMENTS.join(", ");
-
-      formData.append("jobDescription", jobDesc);
+      formData.append("jobDescription", getJobDescriptionText());
 
       const result = await parseResumeAndCompare(formData);
 
@@ -380,24 +387,24 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
       <div className="overflow-x-auto -mx-1 px-1 print:hidden">
         <div className="flex items-center w-full min-w-[500px] max-w-5xl">
           {[
-            { num: 1, label: "Select Job" },
+            { num: 1, label: "Target Job" },
             { num: 2, label: "Upload & Analyze" },
             { num: 3, label: "Review Info" },
             { num: 4, label: "Generated Resume" },
           ].map((s, index) => (
             <React.Fragment key={s.num}>
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${step >= s.num ? "bg-[#2563eb] text-white" : "bg-[#f3f4f6] text-[#6b7280]"
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${step >= s.num ? "bg-[#2563EB] text-white" : "bg-[#f3f4f6] text-[#6b7280]"
                   }`}>
                   {step > s.num ? "✓" : s.num}
                 </div>
-                <span className={`text-sm whitespace-nowrap ${step >= s.num ? "font-bold text-[#111827]" : "font-semibold text-[#6b7280]"
+                <span className={`text-sm whitespace-nowrap ${step >= s.num ? "font-bold text-[#0F172A]" : "font-semibold text-[#6b7280]"
                   }`}>
                   {s.label}
                 </span>
               </div>
               {index < 3 && (
-                <div className={`flex-1 h-px mx-3 sm:mx-4 ${step > s.num ? "bg-[#2563eb]" : "bg-gray-200"
+                <div className={`flex-1 h-px mx-3 sm:mx-4 ${step > s.num ? "bg-[#2563EB]" : "bg-gray-200"
                   }`}></div>
               )}
             </React.Fragment>
@@ -405,40 +412,100 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
         </div>
       </div>
 
-      {/* --- Step 1: Select Job --- */}
+      {/* --- Step 1: Select Job or Paste JD --- */}
       {step === 1 && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 max-w-[500px] animate-in slide-in-from-right-4 duration-300">
-          <h3 className="text-lg font-bold text-[#111827] mb-6">Choose Target Job</h3>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 max-w-[560px] animate-in slide-in-from-right-4 duration-300">
+          <h3 className="text-lg font-bold text-[#111827] mb-2">Choose Target Job</h3>
+          <p className="text-sm text-[#6b7280] mb-6">Select an existing job posting or paste a custom job description</p>
 
-          <div className="flex flex-col gap-2 mb-8">
-            <label className="text-[11px] font-bold text-[#6b7280] uppercase tracking-wider">
-              SELECT A JOB POSTING
-            </label>
-            <div className="relative">
-              <select
-                className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm text-[#4b5563] focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow appearance-none cursor-pointer"
-                value={selectedJob}
-                onChange={(e) => setSelectedJob(e.target.value)}
-              >
-                <option value="" disabled>— Select a role —</option>
-                {jobs.map(job => (
-                  <option key={job.id} value={job.id}>
-                    {job.jobTitle} @ {job.companyName}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
+          {/* Mode Toggle */}
+          <div className="flex rounded-lg bg-[#f3f4f6] p-1 mb-6">
+            <button
+              onClick={() => setJdMode("select")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-all duration-200 ${jdMode === "select"
+                ? "bg-white text-[#111827] shadow-sm"
+                : "text-[#6b7280] hover:text-[#374151]"
+                }`}
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Select a Job
+            </button>
+            <button
+              onClick={() => setJdMode("paste")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-all duration-200 ${jdMode === "paste"
+                ? "bg-white text-[#111827] shadow-sm"
+                : "text-[#6b7280] hover:text-[#374151]"
+                }`}
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Paste JD
+            </button>
           </div>
 
+          {/* Select Mode */}
+          {jdMode === "select" && (
+            <div className="flex flex-col gap-2 mb-8 animate-in fade-in duration-200">
+              <label className="text-[11px] font-bold text-[#6b7280] uppercase tracking-wider">
+                SELECT A JOB POSTING
+              </label>
+              <div className="relative">
+                <select
+                  className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm text-[#4b5563] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none transition-shadow appearance-none cursor-pointer"
+                  value={selectedJob}
+                  onChange={(e) => setSelectedJob(e.target.value)}
+                >
+                  <option value="" disabled>— Select a role —</option>
+                  {jobs.map(job => (
+                    <option key={job.id} value={job.id}>
+                      {job.jobTitle} @ {job.companyName}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              {jobs.length === 0 && (
+                <p className="text-xs text-amber-600 mt-1">No job postings available. Try pasting a JD instead.</p>
+              )}
+            </div>
+          )}
+
+          {/* Paste Mode */}
+          {jdMode === "paste" && (
+            <div className="flex flex-col gap-2 mb-8 animate-in fade-in duration-200">
+              <label className="text-[11px] font-bold text-[#6b7280] uppercase tracking-wider">
+                PASTE JOB DESCRIPTION
+              </label>
+              <textarea
+                value={customJd}
+                onChange={(e) => setCustomJd(e.target.value)}
+                placeholder={"Paste the full job description here...\n\nExample:\nSoftware Engineer at TechCorp\n\nResponsibilities:\n- Build and maintain web applications\n- Collaborate with cross-functional teams\n\nRequirements:\n- 3+ years of experience with React/Next.js\n- Strong TypeScript skills"}
+                className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-[#4b5563] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none transition-shadow resize-none h-48 leading-relaxed"
+              />
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-[#9ca3af]">
+                  {customJd.trim().length > 0
+                    ? `${customJd.trim().length} characters`
+                    : "Minimum 20 characters"}
+                </p>
+                {customJd.trim().length > 0 && customJd.trim().length <= 20 && (
+                  <p className="text-xs text-amber-600">Please paste a more detailed description</p>
+                )}
+              </div>
+            </div>
+          )}
+
           <button
-            disabled={!selectedJob}
+            disabled={!canProceedStep1}
             onClick={() => setStep(2)}
-            className={`text-sm font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-1.5 shadow-sm ${selectedJob ? "bg-[#2563eb] hover:bg-[#1d4ed8] text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            className={`text-sm font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-1.5 shadow-sm ${canProceedStep1 ? "bg-[#2563EB] hover:bg-[#172554] text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             Continue
@@ -465,7 +532,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer ${isDragging ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                   }`}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -476,7 +543,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                   accept=".pdf,.doc,.docx"
                   onChange={handleFileSelect}
                 />
-                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-[#EFF6FF] text-[#2563EB] rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
@@ -493,7 +560,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                   <h4 className="text-[13px] font-bold text-gray-500 uppercase tracking-wider mb-4">Or use a recently uploaded resume</h4>
                   <div className="space-y-3">
                     {recentResumes.map(resume => (
-                      <div key={resume.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/50 transition-all shadow-sm">
+                      <div key={resume.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-[#EFF6FF]/50 transition-all shadow-sm">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6b7280">
@@ -516,7 +583,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                             <>
                               <button
                                 onClick={() => handleUseRecentResume(resume.id)}
-                                className="text-sm font-semibold py-1.5 px-4 bg-white border border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-300 rounded-md shadow-sm transition-colors"
+                                className="text-sm font-semibold py-1.5 px-4 bg-white border border-gray-200 text-gray-700 hover:text-[#2563EB] hover:border-blue-300 rounded-md shadow-sm transition-colors"
                               >
                                 Continue
                               </button>
@@ -540,7 +607,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             </>
           ) : (
             <div className="py-12 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+              <div className="w-16 h-16 border-4 border-red-100 border-t-[#2563EB] rounded-full animate-spin mb-6"></div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Analyzing Resume with AI...</h3>
               <p className="text-sm text-gray-500 max-w-[250px] animate-pulse">
                 Extracting skills, experience, and contact information...
@@ -626,7 +693,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           type="text"
                           value={resumeData.name}
                           onChange={e => setResumeData({ ...resumeData, name: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none"
                         />
                       </div>
                       <div>
@@ -635,7 +702,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           type="email"
                           value={resumeData.email}
                           onChange={e => setResumeData({ ...resumeData, email: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none"
                         />
                       </div>
                       <div>
@@ -644,7 +711,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           type="text"
                           value={resumeData.phone}
                           onChange={e => setResumeData({ ...resumeData, phone: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none"
                         />
                       </div>
                       <div>
@@ -653,7 +720,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           type="text"
                           value={resumeData.location}
                           onChange={e => setResumeData({ ...resumeData, location: e.target.value })}
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none"
                         />
                       </div>
                       <div className="md:col-span-2">
@@ -663,7 +730,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           value={resumeData.socials}
                           onChange={e => setResumeData({ ...resumeData, socials: e.target.value })}
                           placeholder="e.g. github.com/user, linkedin..."
-                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none"
+                          className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -673,7 +740,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                       <textarea
                         value={resumeData.executiveSummary}
                         onChange={e => setResumeData({ ...resumeData, executiveSummary: e.target.value })}
-                        className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none h-24 resize-none"
+                        className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none h-24 resize-none"
                       />
                     </div>
 
@@ -685,7 +752,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                           </label>
                           <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md bg-white min-h-[40px] items-start">
                             {Array.isArray(skills) && skills.map((skill: string, i: number) => (
-                              <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
+                              <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-[#EFF6FF] text-[#2563EB] text-xs font-semibold rounded-full border border-blue-200">
                                 {skill}
                                 <button
                                   type="button"
@@ -694,7 +761,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                                     newSkills.splice(i, 1);
                                     setResumeData({ ...resumeData, categorizedSkills: { ...resumeData.categorizedSkills, [category]: newSkills } });
                                   }}
-                                  className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors text-blue-500 hover:text-blue-800 focus:outline-none"
+                                  className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors text-red-500 hover:text-red-800 focus:outline-none"
                                 >
                                   &times;
                                 </button>
@@ -725,7 +792,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
 
                       {/* Advanced JSON Editor for deeply nested structures */}
                       <details className="cursor-pointer group">
-                        <summary className="text-sm font-bold text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1">
+                        <summary className="text-sm font-bold text-[#2563EB] hover:text-[#172554] mb-2 flex items-center gap-1">
                           Edit Advanced Structures (JSON)
                           <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="group-open:rotate-180 transition-transform">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -748,7 +815,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                               // Invalid JSON, don't update state
                             }
                           }}
-                          className="w-full border border-gray-300 rounded-md p-3 text-xs font-mono text-gray-800 bg-gray-50 focus:border-blue-500 focus:outline-none h-96 resize-y mt-2"
+                          className="w-full border border-gray-300 rounded-md p-3 text-xs font-mono text-gray-800 bg-gray-50 focus:border-red-500 focus:outline-none h-96 resize-y mt-2"
                         />
                       </details>
                     </div>
@@ -758,7 +825,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
                   <div className="mt-8 flex justify-end">
                     <button
                       onClick={handleGenerate}
-                      className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-sm font-semibold py-2.5 px-6 rounded-md transition-colors flex items-center gap-2 shadow-sm"
+                      className="bg-[#2563EB] hover:bg-[#172554] text-white text-sm font-semibold py-2.5 px-6 rounded-md transition-colors flex items-center gap-2 shadow-sm"
                     >
                       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -771,7 +838,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             </>
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 max-w-[600px] mx-auto w-full flex flex-col items-center justify-center text-center mt-10">
-              <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+              <div className="w-16 h-16 border-4 border-red-100 border-t-[#2563EB] rounded-full animate-spin mb-6"></div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">AI is crafting your ATS friendly resume...</h3>
               <p className="text-sm text-gray-500 max-w-[280px] animate-pulse">
                 Optimizing your experience with targeted ATS keywords and impact metrics.
@@ -787,7 +854,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4 print:hidden">
             <div>
               <h3 className="text-xl font-bold text-[#111827]">Your Tailored Resume is Ready!</h3>
-              <p className="text-sm text-gray-500">Optimized for {activeJob ? `${activeJob.jobTitle} @ ${activeJob.companyName}` : "Selected Role"}</p>
+              <p className="text-sm text-gray-500">Optimized for {activeJob ? `${activeJob.jobTitle} @ ${activeJob.companyName}` : jdMode === "paste" && customJd.trim() ? `Custom JD: "${customJd.trim().substring(0, 60)}${customJd.trim().length > 60 ? '...' : ''}"` : "Selected Role"}</p>
             </div>
             <div className="flex gap-3">
               <button
@@ -825,35 +892,30 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
           {/* Resume Preview Document (Mock - Matches PDF visually) */}
           <div id="resume-preview-document" className="bg-white rounded-sm shadow-xl border border-gray-200 p-8 sm:p-14 min-h-[800px] font-sans text-gray-800 leading-snug">
 
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 border-b-2 border-[#1e3a8a] pb-5 mb-6">
-              <div className="shrink-0">
-                <img src="/logo.png" alt="Logo" className="w-32 sm:w-40 h-auto max-h-24 object-contain object-left-top" />
+            <div className="border-b-2 border-[#172554] pb-5 mb-6 text-center sm:text-left">
+              <h1 className="text-[20px] sm:text-[22px] font-extrabold text-[#172554] uppercase tracking-wide leading-none mb-2">{resumeData.name}</h1>
+              <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium mb-1.5">
+                {resumeData.location && <span>{resumeData.location}</span>}
+                {resumeData.location && (resumeData.email || resumeData.phone) && <span className="text-gray-300">|</span>}
+                {resumeData.email && <span>{resumeData.email}</span>}
+                {resumeData.email && resumeData.phone && <span className="text-gray-300">|</span>}
+                {resumeData.phone && <span>{resumeData.phone}</span>}
               </div>
-              <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-[20px] sm:text-[22px] font-extrabold text-[#1e3a8a] uppercase tracking-wide leading-none mb-2">{resumeData.name}</h1>
-                <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium mb-1.5">
-                  {resumeData.location && <span>{resumeData.location}</span>}
-                  {resumeData.location && (resumeData.email || resumeData.phone) && <span className="text-gray-300">|</span>}
-                  {resumeData.email && <span>{resumeData.email}</span>}
-                  {resumeData.email && resumeData.phone && <span className="text-gray-300">|</span>}
-                  {resumeData.phone && <span>{resumeData.phone}</span>}
+              {parseSocials(resumeData.socials).length > 0 && (
+                <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium">
+                  {parseSocials(resumeData.socials).map((soc, idx, arr) => (
+                    <React.Fragment key={idx}>
+                      <span>{soc}</span>
+                      {idx < arr.length - 1 && <span className="text-gray-300">|</span>}
+                    </React.Fragment>
+                  ))}
                 </div>
-                {parseSocials(resumeData.socials).length > 0 && (
-                  <div className="text-[12px] text-gray-600 flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 font-medium">
-                    {parseSocials(resumeData.socials).map((soc, idx, arr) => (
-                      <React.Fragment key={idx}>
-                        <span>{soc}</span>
-                        {idx < arr.length - 1 && <span className="text-gray-300">|</span>}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
 
             {resumeData.executiveSummary && (
               <div className="mb-5">
-                <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Profile Summary</h2>
+                <h2 className="text-[13px] font-bold text-[#172554] uppercase border-b border-blue-200 mb-2 pb-0.5">Profile Summary</h2>
                 <p className="text-[12px] text-gray-800 leading-relaxed">
                   {resumeData.executiveSummary}
                 </p>
@@ -861,7 +923,7 @@ export default function AiResumeBuilderTab({ jobs = [] }: { jobs?: any[] }) {
             )}
 
             <div className="mb-5">
-              <h2 className="text-[13px] font-bold text-[#1e3a8a] uppercase border-b border-blue-200 mb-2 pb-0.5">Technical Skills</h2>
+              <h2 className="text-[13px] font-bold text-[#172554] uppercase border-b border-blue-200 mb-2 pb-0.5">Technical Skills</h2>
               <div className="space-y-1 mt-1 text-[12px]">
                 {Object.entries(resumeData.categorizedSkills).map(([category, skills]) => skills.length > 0 && (
                   <div key={category} className="flex items-start gap-1">

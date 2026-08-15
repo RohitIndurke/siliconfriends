@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 /**
  * S-10: Security headers applied to every response.
@@ -34,6 +35,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
   // Prevent webpack from bundling pdf2json which uses node.js native modules
   serverExternalPackages: ["pdf2json"],
   async headers() {
