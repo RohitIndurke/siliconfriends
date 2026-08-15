@@ -5,7 +5,6 @@ import { signIn } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function LoginClient() {
   const router = useRouter();
@@ -48,15 +47,12 @@ export default function LoginClient() {
         className="w-full max-w-[380px] bg-white p-5 sm:p-8 rounded-2xl border border-gray-200 shadow-sm"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <Image
-              src="/sf-logo.png"
-              alt="SiliconFriends Logo"
-              width={48}
-              height={48}
-              className="w-12 h-12 object-cover rounded-xl shadow-sm"
-            />
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">SiliconFriends</span>
+          <div className="flex items-center gap-1.5 mb-3">
+            <span className="select-none flex items-center">
+              <span className="font-medino text-[#2563EB] font-medium text-3xl sm:text-4xl leading-none">sf</span>
+              <span className="text-gray-300 mx-2 font-light text-2xl sm:text-3xl">|</span>
+              <span className="text-[#0F172A] text-2xl sm:text-3xl font-bold leading-none">SiliconFriends</span>
+            </span>
           </div>
           <h1 className="text-[15px] font-medium text-gray-500">
             Sign in to your account
