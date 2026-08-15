@@ -46,8 +46,8 @@ export default function JobDetailClient({ job }: { job: any }) {
                <div className="flex items-center gap-3">
                   <span className="select-none flex items-center">
                      <span className="font-medino text-[#2563EB] font-medium text-3xl sm:text-4xl leading-none">sf</span>
-                     <span className="text-gray-300 mx-1.5 font-light text-2xl sm:text-3xl">|</span>
-                     <span className="text-[#0F172A] text-2xl sm:text-3xl font-bold leading-none">SiliconFriends</span>
+                     <span className="text-gray-300 mx-2 font-light text-lg sm:text-xl">|</span>
+                     <span className="text-[#0F172A] text-base sm:text-lg font-bold tracking-tight">SiliconFriends</span>
                   </span>
                </div>
                <div className="flex items-center gap-5">
