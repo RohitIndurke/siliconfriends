@@ -41,14 +41,11 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm print:hidden">
         <div className="mx-auto max-w-[1300px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="MIT Arts Commerce & Science College"
-              width={180}
-              height={48}
-              className="h-8 sm:h-10 w-auto object-contain"
-              priority
-            />
+            <span className="text-lg sm:text-xl font-bold tracking-tight select-none flex items-center">
+              <span className="font-medino text-[#2563EB] font-medium text-3xl sm:text-4xl leading-none">sf</span>
+              <span className="text-gray-300 mx-1.5 font-light">|</span>
+              <span className="text-[#0F172A]">SiliconFriends</span>
+            </span>
           </div>
           <div className="flex items-center gap-3 sm:gap-5">
             {session ? (
@@ -63,7 +60,7 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
                       !
                     </button>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
                       {session.user.name.substring(0, 2)}
                     </div>
                   )}
@@ -73,14 +70,14 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="text-sm text-red-600 hover:text-red-800 font-medium transition-colors"
+                  className="text-sm text-[#2563EB] hover:text-[#172554] font-medium transition-colors"
                 >
                   Logout
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
+                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-[#2563EB]">
                   Login
                 </Link>
               </div>
@@ -94,10 +91,10 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
         {/* Page Title + Admin Buttons (mobile) */}
         <div className="flex items-center justify-between gap-3 mb-5 print:hidden">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7C3AED"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Jobs</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A]">Jobs</h1>
           </div>
           {/* Admin buttons visible on mobile in header row */}
 
@@ -105,14 +102,14 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
 
         {/* Tabs */}
 
-        <div className="border-b border-gray-200 mb-5 sticky top-[52px] sm:top-[60px] z-40 bg-[#f5f5f5] pt-2 pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6 print:hidden">
+        <div className="border-b border-gray-200 mb-5 sticky top-[52px] sm:top-[60px] z-40 bg-[#F8FAFC] pt-2 pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6 print:hidden">
           <div className="flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar">
             {STUDENT_TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
-                  ? "text-blue-600 border-b-2 border-blue-600"
+                  ? "text-[#2563EB] border-b-2 border-[#2563EB]"
                   : "text-gray-500 hover:text-gray-800"
                   }`}
               >
@@ -148,7 +145,7 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
                       {/* Card Header */}
                       <div className="flex items-start justify-between mb-3 sm:mb-4">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-tight">
+                          <h3 className="text-sm sm:text-base font-semibold text-[#0F172A] leading-tight">
                             {job.jobTitle}
                           </h3>
                           {job.companyName && (
@@ -202,7 +199,7 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
                         <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
                           {job.status || "Open"}
                         </span>
-                        <span className="text-xs sm:text-sm text-blue-600 font-medium hover:text-blue-900 transition-colors flex items-center gap-1">
+                        <span className="text-xs sm:text-sm text-[#2563EB] font-medium hover:text-[#172554] transition-colors flex items-center gap-1">
                           View details
                           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </span>
@@ -220,14 +217,14 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
               {/* Popular Tags */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#F59E0B"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#F59E0B" /></svg>
-                  <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Popular Tags</h2>
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#2563EB" /></svg>
+                  <h2 className="text-sm font-bold text-[#0F172A] uppercase tracking-wide">Popular Tags</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {POPULAR_TAGS.map((tag) => (
                     <button
                       key={tag}
-                      className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                      className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-[#EFF6FF] hover:text-[#2563EB] hover:border-blue-200 transition-colors"
                     >
                       {tag}
                     </button>
@@ -237,13 +234,13 @@ export default function ProfileClient({ initialJobs }: { initialJobs: any[] }) {
 
               {/* Offer CTA */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
-                <p className="text-sm font-semibold text-gray-800 leading-snug">
+                <p className="text-sm font-semibold text-[#0F172A] leading-snug">
                   Have you received any offer directly ?
                 </p>
                 <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                   Please provide the offer details for the TPOs records and approval
                 </p>
-                <button className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-900 transition-colors flex items-center gap-1">
+                <button className="mt-3 text-sm font-semibold text-[#2563EB] hover:text-[#172554] transition-colors flex items-center gap-1">
                   <span className="text-lg leading-none">+</span> Create Offer
                 </button>
               </div>

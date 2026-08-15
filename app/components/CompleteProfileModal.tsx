@@ -99,7 +99,7 @@ export const CompleteProfileModal = ({
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-[#2563EB] focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
             />
           </div>
 
@@ -111,7 +111,7 @@ export const CompleteProfileModal = ({
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all cursor-pointer"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-[#2563EB] focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all cursor-pointer"
             >
               {DEPARTMENTS.map((dept) => (
                 <option key={dept} value={dept}>
@@ -134,7 +134,7 @@ export const CompleteProfileModal = ({
               value={cgpa}
               onChange={(e) => setCgpa(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-[#2563EB] focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
             />
           </div>
 
@@ -148,7 +148,7 @@ export const CompleteProfileModal = ({
               value={skills}
               onChange={(e) => setSkills(e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:border-[#2563EB] focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all"
             />
             <span className="text-[11px] text-gray-400">Separate skills with a comma</span>
           </div>
@@ -156,7 +156,7 @@ export const CompleteProfileModal = ({
           <button
             type="submit"
             disabled={loading}
-            className={`mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all text-sm flex items-center justify-center shadow-md shadow-blue-500/20 ${loading ? "opacity-70 cursor-not-allowed" : ""
+            className={`mt-3 w-full bg-[#2563EB] hover:bg-[#172554] text-white font-semibold py-3 rounded-xl transition-all text-sm flex items-center justify-center shadow-md shadow-blue-500/20 ${loading ? "opacity-70 cursor-not-allowed" : ""
               }`}
           >
             {loading ? (

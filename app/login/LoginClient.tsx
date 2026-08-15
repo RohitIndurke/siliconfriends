@@ -79,7 +79,7 @@ export default function LoginClient() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-white border border-gray-300 rounded-md p-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow text-base sm:text-sm"
+              className="w-full bg-white border border-gray-300 rounded-md p-2.5 text-gray-900 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none transition-shadow text-base sm:text-sm"
             />
           </div>
 
@@ -92,14 +92,14 @@ export default function LoginClient() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-white border border-gray-300 rounded-md p-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-shadow text-base sm:text-sm"
+              className="w-full bg-white border border-gray-300 rounded-md p-2.5 text-gray-900 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] focus:outline-none transition-shadow text-base sm:text-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition-colors text-sm flex items-center justify-center ${loading ? "opacity-70 cursor-not-allowed" : ""
+            className={`mt-2 w-full bg-[#2563EB] hover:bg-[#172554] text-white font-medium py-2.5 rounded-md transition-colors text-sm flex items-center justify-center ${loading ? "opacity-70 cursor-not-allowed" : ""
               }`}
           >
             {loading ? (

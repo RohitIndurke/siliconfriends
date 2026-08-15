@@ -41,8 +41,8 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
       : "ST";
 
     const status = s.placementStatus || "Active";
-    let statusBg = "bg-blue-100";
-    let statusText = "text-blue-700";
+    let statusBg = "bg-red-100";
+    let statusText = "text-red-700";
     if (status === "Placed") {
       statusBg = "bg-green-100";
       statusText = "text-green-700";
@@ -61,7 +61,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
       email: s.email,
       dept: s.department || "Unassigned",
       cgpa: s.cgpa !== null && s.cgpa !== undefined ? String(s.cgpa) : "-",
-      cgpaColor: s.cgpa >= 8.5 ? "text-green-600" : "text-blue-600",
+      cgpaColor: s.cgpa >= 8.5 ? "text-green-600" : "text-red-600",
       skills: skillsList.slice(0, 3),
       extraSkills: skillsList.length > 3 ? `+${skillsList.length - 3}` : null,
       status,
@@ -96,10 +96,10 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
         <div className="flex items-center gap-3">
           <button
             onClick={onAddStudent}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#172554] text-white rounded-lg text-sm font-semibold shadow-sm transition-all shrink-0"
           >
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             Add Student
           </button>
@@ -119,7 +119,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, roll number, or email..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] transition-all shadow-sm"
           />
         </div>
         <div className="flex gap-4 sm:w-[400px]">
@@ -127,7 +127,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm text-gray-700 cursor-pointer"
+              className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] transition-all shadow-sm text-gray-700 cursor-pointer"
             >
               <option>All Departments</option>
               {DEPARTMENTS.map((dept) => (
@@ -146,7 +146,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm text-gray-700 cursor-pointer"
+              className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] transition-all shadow-sm text-gray-700 cursor-pointer"
             >
               <option>All Statuses</option>
               <option>Placed</option>
@@ -178,7 +178,7 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
               <div key={i} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 border border-blue-100">
+                    <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-bold shrink-0 border border-red-100">
                       {student.initials}
                     </div>
                     <div>
@@ -253,11 +253,11 @@ export default function StudentsTab({ students = [], onAddStudent }: StudentsTab
                       <td className="px-6 py-4 text-gray-500 font-mono text-xs">{student.roll}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 border border-blue-100">
+                          <div className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center text-xs font-bold shrink-0 border border-blue-100">
                             {student.initials}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{student.name}</p>
+                            <p className="font-semibold text-gray-900 group-hover:text-[#2563EB] transition-colors">{student.name}</p>
                             <p className="text-xs text-gray-500">{student.email}</p>
                           </div>
                         </div>

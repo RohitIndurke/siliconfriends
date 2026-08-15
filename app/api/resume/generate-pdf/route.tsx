@@ -65,11 +65,6 @@ export async function POST(req: NextRequest) {
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              {logoDataUrl && typeof logoDataUrl === 'string' && logoDataUrl.startsWith("data:") ? (
-                <Image src={logoDataUrl} style={styles.logo} />
-              ) : null}
-            </View>
             <View style={styles.headerText}>
               <Text style={styles.name}>{resumeData.name || "Resume"}</Text>
               <View style={styles.contact}>

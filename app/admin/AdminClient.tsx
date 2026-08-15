@@ -44,20 +44,17 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="mx-auto max-w-[1300px] px-4 sm:px-6 py-2 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="MIT Arts Commerce & Science College"
-              width={180}
-              height={48}
-              className="h-8 sm:h-10 w-auto object-contain"
-              priority
-            />
+            <span className="text-lg sm:text-xl font-bold tracking-tight select-none flex items-center">
+              <span className="font-medino text-[#2563EB] font-medium text-3xl sm:text-4xl leading-none">sf</span>
+              <span className="text-gray-300 mx-1.5 font-light">|</span>
+              <span className="text-[#0F172A]">SiliconFriends</span>
+            </span>
           </div>
           <div className="flex items-center gap-3 sm:gap-5">
             {session ? (
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center text-sm font-bold border-2 border-blue-200 uppercase shrink-0">
                     {session.user.name.substring(0, 2)}
                   </div>
                   <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[150px] truncate">
@@ -66,14 +63,14 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="text-sm text-red-600 hover:text-red-800 font-medium transition-colors"
+                  className="text-sm text-[#2563EB] hover:text-[#172554] font-medium transition-colors"
                 >
                   Logout
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
+                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-[#2563EB]">
                   Login
                 </Link>
               </div>
@@ -87,17 +84,17 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
         {/* Page Title + Admin Buttons (mobile) */}
         <div className="flex items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7C3AED"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><rect x="2" y="7" width="20" height="14" rx="2" strokeWidth="1.5" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Jobs</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A]">Jobs</h1>
           </div>
           {/* Admin buttons visible on mobile in header row */}
           <div className="flex lg:hidden items-center gap-2">
 
             <button
               onClick={() => setIsJobFormOpen(true)}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-[#2563eb] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#1d4ed8] transition-colors"
+              className="flex items-center gap-1.5 text-sm font-semibold bg-[#2563EB] text-white shadow-sm px-3 py-2 rounded-lg hover:bg-[#1d4ed8] transition-colors"
             >
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -115,7 +112,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
-                  ? "text-blue-600 border-b-2 border-blue-600"
+                  ? "text-[#2563EB] border-b-2 border-[#2563EB]"
                   : "text-gray-500 hover:text-gray-800"
                   }`}
               >
@@ -153,7 +150,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                       {/* Card Header */}
                       <div className="flex items-start justify-between mb-3 sm:mb-4">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-tight">
+                          <h3 className="text-sm sm:text-base font-semibold text-[#0F172A] leading-tight">
                             {job.jobTitle}
                           </h3>
                           {job.companyName && (
@@ -173,7 +170,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                               e.stopPropagation();
                               setEditingJob(job);
                             }}
-                            className="bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold px-3 py-0.5 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm ml-1 flex items-center gap-1"
+                            className="bg-[#EFF6FF] text-[#2563EB] border border-blue-200 text-xs font-semibold px-3 py-0.5 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm ml-1 flex items-center gap-1"
                           >
                             <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -220,7 +217,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
                         <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
                           {job.status || "Open"}
                         </span>
-                        <span className="text-xs sm:text-sm text-blue-600 font-medium hover:text-blue-900 transition-colors flex items-center gap-1">
+                        <span className="text-xs sm:text-sm text-[#2563EB] font-medium hover:text-[#172554] transition-colors flex items-center gap-1">
                           View details
                           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </span>
@@ -237,7 +234,7 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
 
                 <button
                   onClick={() => setIsJobFormOpen(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#2563eb] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#1d4ed8] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 text-[13px] font-semibold bg-[#2563EB] text-white shadow-sm py-2.5 rounded-lg hover:bg-[#1d4ed8] transition-colors"
                 >
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -249,14 +246,14 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
               {/* Popular Tags */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#F59E0B"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#F59E0B" /></svg>
-                  <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Popular Tags</h2>
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#2563EB"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7" cy="7" r="1" fill="#2563EB" /></svg>
+                  <h2 className="text-sm font-bold text-[#0F172A] uppercase tracking-wide">Popular Tags</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {POPULAR_TAGS.map((tag) => (
                     <button
                       key={tag}
-                      className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                      className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-[#EFF6FF] hover:text-[#2563EB] hover:border-blue-200 transition-colors"
                     >
                       {tag}
                     </button>
@@ -266,13 +263,13 @@ export default function AdminClient({ initialJobs, dashboardData }: { initialJob
 
               {/* Offer CTA */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
-                <p className="text-sm font-semibold text-gray-800 leading-snug">
+                <p className="text-sm font-semibold text-[#0F172A] leading-snug">
                   Have you received any offer directly ?
                 </p>
                 <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                   Please provide the offer details for the TPOs records and approval
                 </p>
-                <button className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-900 transition-colors flex items-center gap-1">
+                <button className="mt-3 text-sm font-semibold text-[#2563EB] hover:text-[#172554] transition-colors flex items-center gap-1">
                   <span className="text-lg leading-none">+</span> Create Offer
                 </button>
               </div>
