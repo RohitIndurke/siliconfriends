@@ -1,3 +1,4 @@
+
 # SiliconFriends
 
 SiliconFriends is a modern web application built with **Next.js 16**, featuring a robust authentication system, an AI-powered resume builder, and an intuitive user interface powered by **HeroUI** and **Tailwind CSS**.
